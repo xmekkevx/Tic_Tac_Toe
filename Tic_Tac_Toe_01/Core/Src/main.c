@@ -110,17 +110,12 @@ void lcd_show_player(char player)
 
 void greet() {
 
-	lcd_show_2lines("TIC TAC TOE ", "  ");
+	lcd_show_2lines("Welcome ", "to...  ");
 	HAL_Delay(2000);
 
-	lcd_show_2lines("Willkommen", " Spieler ");
+	lcd_show_2lines(" TicTac ", "  Toe! ");
 	HAL_Delay(2000);
 
-	lcd_show_2lines("Du vs KI", "Viel Glue");
-	HAL_Delay(2000);
-
-	lcd_show_2lines("ck!", "Have Fun!");
-	HAL_Delay(2000);
 
 	lcd_clr();
 }
@@ -161,6 +156,8 @@ int askReplay() {
     char choice;
 
     printf("\nMoechtest du noch einmal spielen? (j/n): ");
+	lcd_show_2lines("Again?", "");
+
     scanf(" %c", &choice);
 
     if (choice == 'j' || choice == 'J')
@@ -201,13 +198,28 @@ void startGame(Game *game) {
         if (game->currentPlayer == 'X') {
 
             printf("Dein Zug (1-9): ");
-            scanf("%d", &input);
+        	lcd_show_2lines("Ur turn:", "(1-9): ");
+        	 // STATT scanf: Wir lesen ein Zeichen und prüfen es sofort
+        	 char c = uart_getchar();
+        	 printf("%c\r\n", c); // Zeige gedrückte Taste im Terminal
 
+        	 // Prüfen, ob es eine Zahl zwischen 1 und 9 ist
+        	if (c >= '1' && c <= '9') {
+        	   input = c - '0'; // ASCII zu Integer umwandeln
+        	   if (!playerMove(game, input)) {
+        	          printf("Feld belegt!\r\n");
+        	          lcd_show_2lines("Field", "Taken! ");
+        	          HAL_Delay(1000);
+        	          continue;
+        	   }
+        	   } else {
+        	                 // Hier landen wir bei Buchstaben/Sonderzeichen -> KEINE Endlosschleife mehr!
+        	      printf("Ungueltige Taste!\r\n");
+        	      lcd_show_2lines("Only", "1-9! ");
+        	      HAL_Delay(1000);
+        	      continue;
+        	   }
 
-            if (!playerMove(game, input)) {
-                printf("Ungueltiger Zug!\r\n");
-                continue;
-            }
         }
 
         /* KI */
@@ -216,6 +228,7 @@ void startGame(Game *game) {
             printf("KI denkt...\r\n");
             lcd_show_2lines("AI is", "thinking...   ");
 
+        	HAL_Delay(2000);
 
             move = aiMove(game);
 
@@ -233,11 +246,15 @@ void startGame(Game *game) {
             printBoard(game);
 
 
-            if (game->currentPlayer == 'X')
+            if (game->currentPlayer == 'X') {
                 printf("Du hast gewonnen!\r\n");
-            else
+            	lcd_show_2lines("You", "win!");
+            }
+            else {
                 printf("Gegner gewinnt!\r\n");
+            	lcd_show_2lines("AI", "wins!");
 
+            }
 
             break;
         }
@@ -250,6 +267,7 @@ void startGame(Game *game) {
 
 
             printf("Unentschieden!\r\n");
+        	lcd_show_2lines("Draw!", " ");
 
 
 
