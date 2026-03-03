@@ -1,0 +1,3 @@
+../Core/Src/retarget_stdio.c:8:6:RetargetInit	16	static
+../Core/Src/retarget_stdio.c:15:5:_write	32	static
+../Core/Src/retarget_stdio.c:27:5:_read	32	static

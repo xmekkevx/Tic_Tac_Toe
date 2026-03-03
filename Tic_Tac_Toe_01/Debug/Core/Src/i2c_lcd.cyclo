@@ -1,0 +1,8 @@
+../Core/Src/i2c_lcd.c:19:6:lcd_init	1
+../Core/Src/i2c_lcd.c:40:13:write_data	1
+../Core/Src/i2c_lcd.c:55:13:write_command	1
+../Core/Src/i2c_lcd.c:70:6:lcd_clr	1
+../Core/Src/i2c_lcd.c:85:6:lcd_putc	1
+../Core/Src/i2c_lcd.c:100:6:lcd_put_str	3
+../Core/Src/i2c_lcd.c:120:6:lcd_cur_pos	4
+../Core/Src/i2c_lcd.c:144:6:lcd_set_cur_blink	3
