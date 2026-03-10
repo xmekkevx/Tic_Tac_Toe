@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include <retarget_stdio.h>
 #include "i2c_lcd.h"
 
@@ -193,7 +194,7 @@ void startGame(Game *game) {
 
     while (1) {
 
-        printBoard(game);
+        ui_printBoard(game);
 
         /* Mensch */
         if (game->currentPlayer == 'X') {
@@ -244,7 +245,7 @@ void startGame(Game *game) {
         /* Sieg */
         if (checkWin(game, game->currentPlayer)) {
 
-            printBoard(game);
+            ui_printBoard(game);
 
 
             if (game->currentPlayer == 'X') {
@@ -264,7 +265,7 @@ void startGame(Game *game) {
         /* Unentschieden */
         if (isDraw(game)) {
 
-            printBoard(game);
+            ui_printBoard(game);
 
 
             printf("Unentschieden!\r\n");
