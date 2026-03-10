@@ -1,9 +1,7 @@
-#include <stdio.h>
 #include "../Inc/game.h"
 
 
 void initGame(Game *game) {
-    printf("\r\nDas Spiel beginnt!\r\n");
     game->turnCounter = 0;
     game->currentPlayer = 'X';
 

@@ -30,6 +30,7 @@
 #include <retarget_stdio.h>
 #include "i2c_lcd.h"
 
+#include "ui.h"
 #include "game.h"
 #include "ai.h"
 

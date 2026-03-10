@@ -12,9 +12,6 @@ typedef struct {
 /* Initialisiert das Spielfeld */
 void initGame(Game *game);
 
-/* Gibt das Spielfeld aus */
-void printBoard(Game *game);
-
 /* Prüft ob jemand gewonnen hat */
 int checkWin(Game *game, char player);
 
