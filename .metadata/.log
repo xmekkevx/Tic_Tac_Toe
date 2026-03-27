@@ -477,3 +477,18 @@ java.io.IOException: Error reading from port (22)
 	at org.eclipse.cdt.serial.SerialPort$1.read(SerialPort.java:108)
 	at java.base/java.io.InputStream.read(InputStream.java:220)
 	at org.eclipse.remote.internal.console.TerminalConsoleConnector$OutThread.run(TerminalConsoleConnector.java:58)
+!SESSION 2026-03-27 22:38:08.682 -----------------------------------------------
+eclipse.buildId=Version 1.19.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-03-27 22:38:46.492
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-03-27 22:38:46.494
+!MESSAGE Log4j2 initialized with config file C:\Users\a911353\Desktop\6. Semester\Eingebettete Systeme\Prüfungsleistung\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-03-27 22:38:58.927
+!MESSAGE Started RMI Server, listening on port 41337
