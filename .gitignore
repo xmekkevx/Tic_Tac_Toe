@@ -1,0 +1,14 @@
+# Build-Ordner (belegen viel Platz und sind lokal)
+Debug/
+Release/
+
+# IDE-spezifische Einstellungen
+.settings/
+.externalToolBuilders/
+
+# Temporäre Dateien von STM32CubeMX
+MXTmpFiles/
+
+# Lokale User-Dateien
+*.launch
+*.bak
