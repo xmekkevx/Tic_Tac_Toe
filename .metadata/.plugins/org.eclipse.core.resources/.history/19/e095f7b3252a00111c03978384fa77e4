@@ -114,6 +114,8 @@ void lcd_show_player(char player)
 }
 
 
+// test
+hallloooooooo
 void greet() {
 
 	lcd_show_2lines("Welcome ", "to...  ");
