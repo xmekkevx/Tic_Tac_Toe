@@ -3,9 +3,10 @@
 #include "usart.h"
 #include "keyboard.h"
 #include "i2c_lcd.h"
-#include "ui.h"
 #include <stdio.h>
 
+void printHelp(void);
+void clearTerminal(void);
 
 static void input_draw_selection(uint8_t selected)
 {
@@ -148,8 +149,8 @@ int input_get_yes_no(void)
         }
         else if (key == INPUT_KEY_HELP)
         {
-        	ui_clear_terminal();
-        	ui_print_help();
+            clearTerminal();
+            printHelp();
             printf("Ja/Nein-Frage: Taste 11 = Yes, Taste 12 = No, oder y/n ueber UART.\r\n");
         }
     }
@@ -190,8 +191,8 @@ uint8_t input_get_confirmed_move_1_to_9(void)
 
         else if (key == INPUT_KEY_HELP)
         {
-        	ui_clear_terminal();
-        	ui_print_help();
+            clearTerminal();
+            printHelp();
 
             if (selected >= 1 && selected <= 9)
                 printf("Aktuelle Auswahl: %d\r\n", selected);

@@ -1,0 +1,145 @@
+#include "ui.h"
+#include "i2c_lcd.h"
+#include "input.h"
+#include <stdio.h>
+
+void ui_clear_terminal(void)
+{
+    printf("\033[2J\033[H");
+}
+
+void ui_print_help(void)
+{
+    printf("\n============== HILFE ==============\r\n");
+    printf("Positionen:\r\n");
+    printf(" 1 | 2 | 3 \r\n");
+    printf("---+---+---\r\n");
+    printf(" 4 | 5 | 6 \r\n");
+    printf("---+---+---\r\n");
+    printf(" 7 | 8 | 9 \r\n");
+
+    printf("\r\nBedienung SPI-Tastatur:\r\n");
+    printf(" 1-9  = Feld waehlen\r\n");
+    printf(" 11   = Yes\r\n");
+    printf(" 12   = No\r\n");
+    printf(" 13   = Korrektur\r\n");
+    printf(" 14   = Hilfe\r\n");
+    printf(" 16   = Enter\r\n");
+
+    printf("\r\nBedienung normale Tastatur:\r\n");
+    printf(" 1-9        = Feld waehlen\r\n");
+    printf(" y          = Yes\r\n");
+    printf(" n          = No\r\n");
+    printf(" Backspace  = Korrektur\r\n");
+    printf(" h          = Hilfe\r\n");
+    printf(" Enter      = Bestaetigen\r\n");
+
+    printf("===================================\r\n\r\n");
+}
+
+void ui_greet(void)
+{
+    lcd_show_2lines("Welcome ", "to...  ");
+    printf("Herzlichen Willkommen zu Tic Tac Toe!\r\n");
+    HAL_Delay(2000);
+
+    lcd_show_2lines(" TicTac ", "  Toe! ");
+    HAL_Delay(2000);
+
+    lcd_clr();
+}
+
+int ui_ask_yes_no_question(const char *terminal_text,
+                           const char *lcd_line1,
+                           const char *lcd_line2,
+                           uint8_t cursor_x,
+                           uint8_t cursor_y)
+{
+    printf("%s\r\n", terminal_text);
+    printf("Ja: y oder Taste 11 | Nein: n oder Taste 12\r\n");
+
+    lcd_show_input(lcd_line1, lcd_line2, cursor_x, cursor_y);
+
+    return input_get_yes_no();
+}
+
+void ui_show_player_turn(char player)
+{
+    char line1[9];
+
+    snprintf(line1, sizeof(line1), "Turn: %c", player);
+    lcd_show_2lines(line1, "");
+}
+
+void ui_show_game_start(char start_player)
+{
+    printf("\n============================\r\n");
+    printf("Das Spiel beginnt!\r\n");
+    printf("Startspieler: %c\r\n", start_player);
+    printf("============================\r\n");
+}
+
+void ui_show_player_prompt(void)
+{
+    printf("\r\nDu bist dran!\r\n");
+    printf("Waehle Feld 1-9, Taste 13/Backspace = Korrektur, Taste 14/h = Hilfe, Taste 16/Enter = Eingabe\r\n");
+}
+
+void ui_show_ai_thinking(void)
+{
+    printf("\r\nKI denkt...\r\n");
+    lcd_show_2lines("AI", "thinks...");
+}
+
+void ui_show_ai_move(uint8_t move)
+{
+    char aiMsg[9];
+
+    printf("KI waehlt Feld %d\r\n", move);
+    snprintf(aiMsg, sizeof(aiMsg), "%d", move);
+    lcd_show_2lines("AI move:", aiMsg);
+}
+
+void ui_show_field_taken(uint8_t field)
+{
+    printf("Feld %d ist bereits belegt!\r\n", field);
+    lcd_show_2lines("Field", "Taken! ");
+}
+
+void ui_show_player_chosen(void)
+{
+    lcd_show_2lines("Chosen!", "");
+}
+
+void ui_show_player_win(void)
+{
+	ui_clear_terminal();
+    printf("\r\nDu hast gewonnen!\r\n");
+    lcd_show_2lines("You", "win!");
+}
+
+void ui_show_ai_win(void)
+{
+	ui_clear_terminal();
+    printf("\r\nDie KI gewinnt!\r\n");
+    lcd_show_2lines("AI", "wins!");
+}
+
+void ui_show_draw(void)
+{
+    printf("\r\nUnentschieden!\r\n");
+    lcd_show_2lines("Draw!", "");
+}
+
+void ui_show_program_end(void)
+{
+    printf("Programm wird beendet.\r\n");
+    lcd_show_2lines("Program", "ended.");
+}
+
+void ui_show_game_screen(Game *game)
+{
+    ui_clear_terminal();
+    printBoard(game);
+    printf("\r\nAktueller Spieler: %c\r\n", game->currentPlayer);
+}

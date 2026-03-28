@@ -104,6 +104,7 @@ void startGame(Game *game)
     int input;
     int move;
 
+    ui_print_help();
 
     lcd_show_2lines("Game", "starts!");
     HAL_Delay(2000);

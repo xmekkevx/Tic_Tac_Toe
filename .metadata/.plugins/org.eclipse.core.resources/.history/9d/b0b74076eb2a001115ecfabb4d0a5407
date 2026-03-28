@@ -104,7 +104,6 @@ void startGame(Game *game)
     int input;
     int move;
 
-
     lcd_show_2lines("Game", "starts!");
     HAL_Delay(2000);
 
@@ -115,37 +114,50 @@ void startGame(Game *game)
     else
         game->currentPlayer = 'O';
 
-    ui_show_game_start(game->currentPlayer);
-    ui_show_player_turn(game->currentPlayer);
+    printf("\n============================\r\n");
+    printf("Das Spiel beginnt!\r\n");
+    printf("Startspieler: %c\r\n", game->currentPlayer);
+    printf("============================\r\n");
+
+    lcd_show_player(game->currentPlayer);
     HAL_Delay(1500);
 
     while (1)
     {
-    	ui_show_game_screen(game);
+        printBoard(game);
 
         if (game->currentPlayer == 'X')
         {
-        	ui_show_player_prompt();
-        	input = input_get_confirmed_move_1_to_9();
+            printf("\r\nDu bist dran!\r\n");
+            printf("Waehle Feld 1-9, Taste 13/Backspace = Korrektur, Taste 14/h = Hilfe, Taste 16/Enter = Eingabe\r\n");
+
+            input = input_get_confirmed_move_1_to_9();
 
             if (!playerMove(game, input))
             {
-            	ui_show_field_taken(input);
-            	HAL_Delay(1200);
+                printf("Feld %d ist bereits belegt!\r\n", input);
+                lcd_show_2lines("Field", "Taken! ");
+                HAL_Delay(1200);
                 continue;
             }
 
-            ui_show_player_chosen();
+            lcd_show_2lines("Chosen!", "");
             HAL_Delay(800);
         }
         else
         {
-        	ui_show_ai_thinking();
-        	HAL_Delay(2000);
+            printf("\r\nKI denkt...\r\n");
+            lcd_show_2lines("AI", "thinks...");
+            HAL_Delay(2000);
 
             move = aiMove(game);
 
-            ui_show_ai_move(move);
+            printf("KI waehlt Feld %d\r\n", move);
+
+            char aiMsg[9];
+            snprintf(aiMsg, sizeof(aiMsg), "%d", move);
+
+            lcd_show_2lines("AI move:", aiMsg);
             HAL_Delay(1800);
 
             playerMove(game, move);
@@ -157,13 +169,15 @@ void startGame(Game *game)
 
             if (game->currentPlayer == 'X')
             {
-            	ui_show_player_win();
-            	HAL_Delay(2000);
+                printf("\r\nDu hast gewonnen!\r\n");
+                lcd_show_2lines("You", "win!");
+                HAL_Delay(2000);
             }
             else
             {
-            	ui_show_ai_win();
-            	HAL_Delay(2000);
+                printf("\r\nDie KI gewinnt!\r\n");
+                lcd_show_2lines("AI", "wins!");
+                HAL_Delay(2000);
             }
 
             break;
@@ -173,7 +187,8 @@ void startGame(Game *game)
         {
             printBoard(game);
 
-            ui_show_draw();
+            printf("\r\nUnentschieden!\r\n");
+            lcd_show_2lines("Draw!", "");
             HAL_Delay(2000);
 
             break;
@@ -181,8 +196,16 @@ void startGame(Game *game)
 
         switchPlayer(game);
 
-        ui_show_player_turn(game->currentPlayer);
-        HAL_Delay(1000);
+        if (game->currentPlayer == 'X')
+        {
+            lcd_show_player(game->currentPlayer);
+            HAL_Delay(1000);
+        }
+        else
+        {
+            lcd_show_player(game->currentPlayer);
+            HAL_Delay(1000);
+        }
     }
 }
 
@@ -228,8 +251,7 @@ int main(void)
   lcd_init(&hi2c1);
   keyboard_init(&hspi1, 10);
   input_init();
-
-  ui_greet();
+  greet();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -240,12 +262,15 @@ int main(void)
 
 
   if (!askStartGame()) {
-      ui_show_program_end();
+	  printf("Programm wurde beendet.\r\n");
+	  lcd_show_2lines("Program", "ended.");
+
+
       return 0;
   }
 
-  ui_clear_terminal();
-  ui_print_help();
+  clearTerminal();
+  printHelp();
 
 
   while (1)
@@ -255,27 +280,28 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  startGame(&game);
 
-	  if (!askReplay())
-	  {
-	      ui_show_program_end();
-	      HAL_Delay(2000);
+	      if (!askReplay())
+	      {
+	          printf("Programm wird beendet.\r\n");
+	          lcd_show_2lines("Program", "ended.");
+	          HAL_Delay(2000);
 
-	      lcd_show_2lines("See you", "later!");
-	      printf("Bis bald!\r\n");
+	          lcd_show_2lines("See you", "later!");
+	          printf("Bis bald!\r\n");
 
-	      HAL_Delay(2000);
+	          HAL_Delay(2000);
 
-	      ui_clear_terminal();
-	      lcd_clr();
-	      break;
-	  }
-	  else
-	  {
-	      ui_clear_terminal();
-	      lcd_clr();
-	      ui_print_help();
-	  }
-	}
+	          clearTerminal();
+	          lcd_clr();
+	          break;
+	      }
+	      else
+	      {
+	          clearTerminal();
+	          lcd_clr();
+	          printHelp();
+	      }
+	    }
 
   /* USER CODE END 3 */
 }

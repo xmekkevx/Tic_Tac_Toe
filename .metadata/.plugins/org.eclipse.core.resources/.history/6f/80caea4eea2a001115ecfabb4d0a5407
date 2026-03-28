@@ -1,0 +1,49 @@
+#include "ui.h"
+#include "i2c_lcd.h"
+#include <stdio.h>
+
+void ui_clear_terminal(void)
+{
+    printf("\033[2J\033[H");
+}
+
+void ui_print_help(void)
+{
+    printf("\n============== HILFE ==============\r\n");
+    printf("Positionen:\r\n");
+    printf(" 1 | 2 | 3 \r\n");
+    printf("---+---+---\r\n");
+    printf(" 4 | 5 | 6 \r\n");
+    printf("---+---+---\r\n");
+    printf(" 7 | 8 | 9 \r\n");
+
+    printf("\r\nBedienung SPI-Tastatur:\r\n");
+    printf(" 1-9  = Feld waehlen\r\n");
+    printf(" 11   = Yes\r\n");
+    printf(" 12   = No\r\n");
+    printf(" 13   = Korrektur\r\n");
+    printf(" 14   = Hilfe\r\n");
+    printf(" 16   = Enter\r\n");
+
+    printf("\r\nBedienung normale Tastatur:\r\n");
+    printf(" 1-9        = Feld waehlen\r\n");
+    printf(" y          = Yes\r\n");
+    printf(" n          = No\r\n");
+    printf(" Backspace  = Korrektur\r\n");
+    printf(" h          = Hilfe\r\n");
+    printf(" Enter      = Bestaetigen\r\n");
+
+    printf("===================================\r\n\r\n");
+}
+
+void ui_greet(void)
+{
+    lcd_show_2lines("Welcome ", "to...  ");
+    printf("Herzlichen Willkommen zu Tic Tac Toe!\r\n");
+    HAL_Delay(2000);
+
+    lcd_show_2lines(" TicTac ", "  Toe! ");
+    HAL_Delay(2000);
+
+    lcd_clr();
+}
