@@ -28,14 +28,21 @@ static void keyboard_draw_selection(uint8_t selected)
 {
     char line2[9];
 
+    lcd_cur_pos(0, 0);
+    lcd_put_str("Ur turn:");
+
     if (selected == 0)
     {
-        lcd_show_input("Ur turn:", "        ", 0, 1);
+        lcd_cur_pos(0, 0);
+        lcd_put_str("_ ");
     }
     else
     {
-        snprintf(line2, sizeof(line2), "%d OK? ", selected);
-        lcd_show_input("Ur turn:", line2, 0, 1);
+        snprintf(line2, sizeof(line2), "%d OK?", selected);
+        lcd_cur_pos(0, 1);
+        lcd_put_str("        ");
+        lcd_cur_pos(0, 1);
+        lcd_put_str(line2);
     }
 }
 
@@ -116,16 +123,9 @@ uint8_t keyboard_get_confirmed_move_1_to_9(void)
 
         if (key >= 1 && key <= 9)
         {
-            if (selected == 0)
-            {
-                selected = key;
-                keyboard_draw_selection(selected);
-                printf("Aktuelle Auswahl: %d\r\n", selected);
-            }
-            else
-            {
-                printf("Auswahl %d bereits gesetzt. Erst Taste 13 fuer Korrektur druecken.\r\n", selected);
-            }
+            selected = key;
+            keyboard_draw_selection(selected);
+            printf("Aktuelle Auswahl: %d\r\n", selected);
         }
         else if (key == 13)
         {

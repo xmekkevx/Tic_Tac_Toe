@@ -156,7 +156,11 @@ void lcd_set_cur_blink(cursor_mode_t cur, cursor_mode_t blink)
     write_command(cmd);
 }
 
-
+typedef enum
+{
+    LCD_MODE_DISPLAY = 0,
+    LCD_MODE_INPUT
+} lcd_mode_t;
 
 void lcd_set_mode(lcd_mode_t mode)
 {
@@ -174,44 +178,5 @@ void lcd_set_mode(lcd_mode_t mode)
             lcd_set_cur_blink(off, off);
             break;
     }
-}
-
-void lcd_show_1line(uint8_t line, const char* text)
-{
-    if (line > 1) return;
-
-    lcd_set_mode(LCD_MODE_DISPLAY);
-
-    lcd_cur_pos(0, line);
-    lcd_put_str("        ");
-
-    lcd_cur_pos(0, line);
-    lcd_put_str(text);
-}
-
-void lcd_show_2lines(const char* line1, const char* line2)
-{
-    lcd_clr();
-    lcd_set_mode(LCD_MODE_DISPLAY);
-
-    lcd_cur_pos(0, 0);
-    lcd_put_str(line1);
-
-    lcd_cur_pos(0, 1);
-    lcd_put_str(line2);
-}
-
-void lcd_show_input(const char* line1, const char* line2, uint8_t cursor_x, uint8_t cursor_y)
-{
-    lcd_clr();
-
-    lcd_cur_pos(0, 0);
-    lcd_put_str(line1);
-
-    lcd_cur_pos(0, 1);
-    lcd_put_str(line2);
-
-    lcd_cur_pos(cursor_x, cursor_y);
-    lcd_set_mode(LCD_MODE_INPUT);
 }
 

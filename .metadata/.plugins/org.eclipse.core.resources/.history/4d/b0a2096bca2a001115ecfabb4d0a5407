@@ -1,0 +1,715 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "i2c.h"
+#include "spi.h"
+#include "usart.h"
+#include "gpio.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#include <retarget_stdio.h>
+#include "i2c_lcd.h"
+#include "keyboard.h"
+#include "game.h"
+#include "ai.h"
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+#define LCD_WIDTH 8
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+/* USER CODE BEGIN PFP */
+static void lcd_format_line(char *dst, const char *src);
+static void lcd_show_2lines_sync(const char *line1, const char *line2);
+static void lcd_show_1line_sync(uint8_t line, const char *text);
+static int uart_getchar_nonblocking(char *c);
+static void show_help_lcd(void);
+static void print_help_terminal(void);
+static void show_help_everywhere(void);
+static void draw_move_selection(uint8_t selected);
+static uint8_t get_confirmed_move_dual(void);
+static int ask_yes_no_dual(const char *line1, const char *line2);
+static void show_current_player(char player);
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+void keyboard_callback(uint8_t key_val)
+{
+    (void)key_val;
+    HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+}
+
+void clearTerminal(void)
+{
+    printf("\033[2J\033[H");
+}
+
+static void lcd_format_line(char *dst, const char *src)
+{
+    size_t i;
+
+    for (i = 0; i < LCD_WIDTH; i++)
+    {
+        if (src[i] != '\0')
+            dst[i] = src[i];
+        else
+            dst[i] = ' ';
+    }
+    dst[LCD_WIDTH] = '\0';
+}
+
+static void lcd_show_2lines_sync(const char *line1, const char *line2)
+{
+    char l1[LCD_WIDTH + 1];
+    char l2[LCD_WIDTH + 1];
+
+    lcd_format_line(l1, line1);
+    lcd_format_line(l2, line2);
+
+    lcd_clr();
+    lcd_cur_pos(0, 0);
+    lcd_put_str(l1);
+    lcd_cur_pos(0, 1);
+    lcd_put_str(l2);
+
+    printf("[LCD] %s | %s\r\n", l1, l2);
+}
+
+static void lcd_show_1line_sync(uint8_t line, const char *text)
+{
+    char buf[LCD_WIDTH + 1];
+
+    if (line > 1) return;
+
+    lcd_format_line(buf, text);
+    lcd_cur_pos(0, line);
+    lcd_put_str("        ");
+    lcd_cur_pos(0, line);
+    lcd_put_str(buf);
+
+    printf("[LCD] line %d: %s\r\n", line, buf);
+}
+
+char uart_getchar(void)
+{
+    char c;
+    HAL_UART_Receive(&huart2, (uint8_t*)&c, 1, HAL_MAX_DELAY);
+    return c;
+}
+
+static int uart_getchar_nonblocking(char *c)
+{
+    if (HAL_UART_Receive(&huart2, (uint8_t*)c, 1, 1) == HAL_OK)
+        return 1;
+    return 0;
+}
+
+static void show_current_player(char player)
+{
+    char line1[9];
+    char line2[9];
+
+    snprintf(line1, sizeof(line1), "Start:%c", player);
+    snprintf(line2, sizeof(line2), "Turn:%c", player);
+
+    lcd_show_2lines_sync(line1, line2);
+}
+
+void greet(void)
+{
+    lcd_show_2lines_sync("Welcome", "to...");
+    HAL_Delay(1500);
+
+    lcd_show_2lines_sync("TicTac", "Toe!");
+    HAL_Delay(1500);
+
+    lcd_clr();
+}
+
+static void print_help_terminal(void)
+{
+    printf("\r\n========== HILFE ==========\r\n");
+    printf("Spielfeld:\r\n");
+    printf(" 1 | 2 | 3 \r\n");
+    printf("---+---+---\r\n");
+    printf(" 4 | 5 | 6 \r\n");
+    printf("---+---+---\r\n");
+    printf(" 7 | 8 | 9 \r\n");
+    printf("\r\nSPI-Tastatur:\r\n");
+    printf(" 1-9  = Feld waehlen\r\n");
+    printf(" 11   = Yes\r\n");
+    printf(" 12   = No\r\n");
+    printf(" 13   = Korrektur / Auswahl loeschen\r\n");
+    printf(" 15   = Hilfe anzeigen\r\n");
+    printf(" 16   = Enter / bestaetigen\r\n");
+    printf("\r\nNormale Tastatur:\r\n");
+    printf(" 1-9  = Feld waehlen\r\n");
+    printf(" Enter = Eingabe bestaetigen\r\n");
+    printf(" Backspace oder c = Korrektur\r\n");
+    printf(" y/n  = Yes / No\r\n");
+    printf(" h oder ? = Hilfe anzeigen\r\n");
+    printf("===========================\r\n\r\n");
+}
+
+static void show_help_lcd(void)
+{
+    lcd_show_2lines_sync("1-9=Fld", "13=Corr");
+    HAL_Delay(1200);
+
+    lcd_show_2lines_sync("11=Yes", "12=No");
+    HAL_Delay(1200);
+
+    lcd_show_2lines_sync("15=Help", "16=Ent");
+    HAL_Delay(1200);
+}
+
+static void show_help_everywhere(void)
+{
+    print_help_terminal();
+    show_help_lcd();
+}
+
+void printHelp(void)
+{
+    show_help_everywhere();
+}
+
+static void draw_move_selection(uint8_t selected)
+{
+    char line2[9];
+
+    if (selected == 0)
+        snprintf(line2, sizeof(line2), "Sel:-OK");
+    else
+        snprintf(line2, sizeof(line2), "Sel:%d OK", selected);
+
+    lcd_show_2lines_sync("Ur turn:", line2);
+}
+
+static uint8_t get_confirmed_move_dual(void)
+{
+    uint8_t selected = 0;
+    uint8_t spi_key;
+    char uart_char;
+
+    draw_move_selection(selected);
+    printf("Bitte waehlen: 1-9 = Feld, 13/Backspace/c = Korrektur, 16/Enter = bestaetigen, 15/h/? = Hilfe\r\n");
+
+    while (1)
+    {
+        spi_key = keyboard_get_key_nonblocking();
+        if (spi_key != 0)
+        {
+            printf("SPI-Taste gedrueckt: %d\r\n", spi_key);
+
+            if (spi_key >= 1 && spi_key <= 9)
+            {
+                selected = spi_key;
+                draw_move_selection(selected);
+                printf("Aktuelle Auswahl: %d\r\n", selected);
+            }
+            else if (spi_key == 13)
+            {
+                selected = 0;
+                draw_move_selection(selected);
+                printf("Korrektur: Auswahl geloescht\r\n");
+            }
+            else if (spi_key == 15)
+            {
+                show_help_everywhere();
+                draw_move_selection(selected);
+                printf("Hilfe beendet. Auswahl bleibt: %s\r\n", (selected == 0) ? "keine" : "vorhanden");
+            }
+            else if (spi_key == 16)
+            {
+                if (selected >= 1 && selected <= 9)
+                {
+                    printf("Eingabe bestaetigt ueber SPI: %d\r\n", selected);
+                    lcd_show_2lines_sync("Chosen:", (selected == 0) ? "-" : "OK");
+                    HAL_Delay(600);
+                    return selected;
+                }
+                else
+                {
+                    printf("Keine gueltige Auswahl zum Bestaetigen vorhanden\r\n");
+                    lcd_show_2lines_sync("No sel!", "Choose");
+                    HAL_Delay(700);
+                    draw_move_selection(selected);
+                }
+            }
+            else
+            {
+                printf("SPI-Taste %d wird ignoriert\r\n", spi_key);
+            }
+        }
+
+        if (uart_getchar_nonblocking(&uart_char))
+        {
+            printf("UART-Eingabe: %c\r\n", uart_char);
+
+            if (uart_char >= '1' && uart_char <= '9')
+            {
+                selected = (uint8_t)(uart_char - '0');
+                draw_move_selection(selected);
+                printf("Aktuelle Auswahl: %d\r\n", selected);
+            }
+            else if (uart_char == 8 || uart_char == 127 || uart_char == 'c' || uart_char == 'C')
+            {
+                selected = 0;
+                draw_move_selection(selected);
+                printf("Korrektur: Auswahl geloescht\r\n");
+            }
+            else if (uart_char == '\r' || uart_char == '\n')
+            {
+                if (selected >= 1 && selected <= 9)
+                {
+                    printf("Eingabe bestaetigt ueber UART: %d\r\n", selected);
+                    lcd_show_2lines_sync("Chosen:", "OK");
+                    HAL_Delay(600);
+                    return selected;
+                }
+                else
+                {
+                    printf("Keine gueltige Auswahl zum Bestaetigen vorhanden\r\n");
+                    lcd_show_2lines_sync("No sel!", "Choose");
+                    HAL_Delay(700);
+                    draw_move_selection(selected);
+                }
+            }
+            else if (uart_char == 'h' || uart_char == 'H' || uart_char == '?')
+            {
+                show_help_everywhere();
+                draw_move_selection(selected);
+                printf("Hilfe beendet. Auswahl bleibt: %s\r\n", (selected == 0) ? "keine" : "vorhanden");
+            }
+            else
+            {
+                printf("UART-Zeichen '%c' wird ignoriert\r\n", uart_char);
+            }
+        }
+
+        HAL_Delay(1);
+    }
+}
+
+static int ask_yes_no_dual(const char *line1, const char *line2)
+{
+    uint8_t spi_key;
+    char uart_char;
+
+    lcd_show_2lines_sync(line1, line2);
+    printf("Antwort moeglich mit UART: y/n oder mit SPI: 11=Yes, 12=No, 15=Help\r\n");
+
+    while (1)
+    {
+        spi_key = keyboard_get_key_nonblocking();
+        if (spi_key != 0)
+        {
+            printf("SPI-Taste gedrueckt: %d\r\n", spi_key);
+
+            if (spi_key == 11)
+            {
+                lcd_show_2lines_sync(line1, "Yes");
+                printf("Antwort: Yes (SPI 11)\r\n");
+                HAL_Delay(500);
+                return 1;
+            }
+            else if (spi_key == 12)
+            {
+                lcd_show_2lines_sync(line1, "No");
+                printf("Antwort: No (SPI 12)\r\n");
+                HAL_Delay(500);
+                return 0;
+            }
+            else if (spi_key == 15)
+            {
+                show_help_everywhere();
+                lcd_show_2lines_sync(line1, line2);
+                printf("Zurueck zur Ja/Nein-Abfrage\r\n");
+            }
+            else
+            {
+                printf("SPI-Taste %d ist hier ungueltig\r\n", spi_key);
+            }
+        }
+
+        if (uart_getchar_nonblocking(&uart_char))
+        {
+            printf("UART-Eingabe: %c\r\n", uart_char);
+
+            if (uart_char == 'y' || uart_char == 'Y' || uart_char == 'j' || uart_char == 'J')
+            {
+                lcd_show_2lines_sync(line1, "Yes");
+                printf("Antwort: Yes (UART)\r\n");
+                HAL_Delay(500);
+                return 1;
+            }
+            else if (uart_char == 'n' || uart_char == 'N')
+            {
+                lcd_show_2lines_sync(line1, "No");
+                printf("Antwort: No (UART)\r\n");
+                HAL_Delay(500);
+                return 0;
+            }
+            else if (uart_char == 'h' || uart_char == 'H' || uart_char == '?')
+            {
+                show_help_everywhere();
+                lcd_show_2lines_sync(line1, line2);
+                printf("Zurueck zur Ja/Nein-Abfrage\r\n");
+            }
+            else
+            {
+                printf("UART-Zeichen '%c' ist hier ungueltig\r\n", uart_char);
+            }
+        }
+
+        HAL_Delay(1);
+    }
+}
+
+int askStartGame(void)
+{
+    return ask_yes_no_dual("Start?", "Y/N 11/12");
+}
+
+int askReplay(void)
+{
+    return ask_yes_no_dual("Again?", "Y/N 11/12");
+}
+
+void startGame(Game *game)
+{
+    int input;
+    int move;
+    char aiMsg[9];
+
+    lcd_show_2lines_sync("Game", "starts!");
+    HAL_Delay(1500);
+
+    initGame(game);
+
+    if (rand() % 2 == 0)
+        game->currentPlayer = 'X';
+    else
+        game->currentPlayer = 'O';
+
+    printf("\r\n============================\r\n");
+    printf("Neues Spiel startet\r\n");
+    printf("Startspieler: %c\r\n", game->currentPlayer);
+    printf("============================\r\n");
+
+    show_current_player(game->currentPlayer);
+    HAL_Delay(1200);
+
+    while (1)
+    {
+        printBoard(game);
+
+        if (game->currentPlayer == 'X')
+        {
+            printf("\r\nDein Zug!\r\n");
+            printf("Waehle Feld 1-9, Korrektur mit 13/Backspace/c, Hilfe mit 15/h, bestaetige mit 16/Enter\r\n");
+
+            input = get_confirmed_move_dual();
+
+            printf("Zug bestaetigt: Feld %d\r\n", input);
+
+            if (!playerMove(game, input))
+            {
+                printf("Feld %d ist bereits belegt!\r\n", input);
+                lcd_show_2lines_sync("Field", "Taken!");
+                HAL_Delay(1200);
+                continue;
+            }
+
+            snprintf(aiMsg, sizeof(aiMsg), "Fld:%d", input);
+            lcd_show_2lines_sync("You chose", aiMsg);
+            HAL_Delay(900);
+        }
+        else
+        {
+            printf("\r\nKI denkt...\r\n");
+            lcd_show_2lines_sync("AI", "thinks");
+            HAL_Delay(1800);
+
+            move = aiMove(game);
+
+            printf("KI waehlt Feld %d\r\n", move);
+
+            snprintf(aiMsg, sizeof(aiMsg), "Fld:%d", move);
+            lcd_show_2lines_sync("AI move", aiMsg);
+            HAL_Delay(1500);
+
+            playerMove(game, move);
+        }
+
+        if (checkWin(game, game->currentPlayer))
+        {
+            printBoard(game);
+
+            if (game->currentPlayer == 'X')
+            {
+                printf("\r\nDu hast gewonnen!\r\n");
+                lcd_show_2lines_sync("You", "win!");
+                HAL_Delay(2000);
+            }
+            else
+            {
+                printf("\r\nDie KI gewinnt!\r\n");
+                lcd_show_2lines_sync("AI", "wins!");
+                HAL_Delay(2000);
+            }
+
+            break;
+        }
+
+        if (isDraw(game))
+        {
+            printBoard(game);
+
+            printf("\r\nUnentschieden!\r\n");
+            lcd_show_2lines_sync("Draw!", "No win");
+            HAL_Delay(2000);
+
+            break;
+        }
+
+        switchPlayer(game);
+
+        if (game->currentPlayer == 'X')
+        {
+            printf("\r\nJetzt bist du wieder dran.\r\n");
+            show_current_player(game->currentPlayer);
+            HAL_Delay(900);
+        }
+        else
+        {
+            printf("\r\nJetzt ist die KI dran.\r\n");
+            show_current_player(game->currentPlayer);
+            HAL_Delay(900);
+        }
+    }
+}
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART2_UART_Init();
+  MX_I2C1_Init();
+  MX_SPI1_Init();
+  /* USER CODE BEGIN 2 */
+
+  RetargetInit(&huart2);
+
+  lcd_init(&hi2c1);
+  keyboard_init(&hspi1, 10);
+  greet();
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  Game game;
+
+  srand(time(NULL));
+
+
+  if (!askStartGame()) {
+	  printf("Spiel wurde beendet.\r\n");
+      return 0;
+  }
+
+  clearTerminal();
+  printHelp();
+
+
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+	  startGame(&game);
+
+	      if (!askReplay())
+	      {
+	          printf("Programm wird beendet.\r\n");
+	          lcd_show_2lines("Program", "ended.");
+	          HAL_Delay(2000);
+
+	          lcd_show_2lines("See you", "later!");
+	          HAL_Delay(2000);
+
+	          clearTerminal();
+	          lcd_clr();
+	          break;
+	      }
+	      else
+	      {
+	          clearTerminal();
+	          lcd_clr();
+	          printHelp();
+	      }
+	    }
+
+  /* USER CODE END 3 */
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage
+  */
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.MSICalibrationValue = 0;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV16;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Enable MSI Auto calibration
+  */
+  HAL_RCCEx_EnableMSIPLLMode();
+}
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+#ifdef USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */

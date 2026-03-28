@@ -24,7 +24,7 @@ void lcd_init(I2C_HandleTypeDef* hi2c)
 	buf[0] = 0x00; // (control byte) CO=0 (nur ein Control-byte), A0=0 Instructions
 	buf[1] = 0x38; // Function_set    DL=1 (I2C),  N=1 (2 Lines), F=0 (5x8 dots)
 	buf[2] = 0x14; // Cursor shift right
-	buf[3] = 0x0C; // Display on, Cursor off, Blink off
+	buf[3] = 0x0F; // Display on (D=1), Cursor on (C=1), Blink on (B=1)
 	buf[4] = 0x06; // Entry_mode_set   ID=1, S=0
 	buf[5] = 0x02; // return home
 	buf[6] = 0x01; // Display clear
@@ -154,64 +154,5 @@ void lcd_set_cur_blink(cursor_mode_t cur, cursor_mode_t blink)
         cmd |= (1 << 0);  // Blink ON
 
     write_command(cmd);
-}
-
-
-
-void lcd_set_mode(lcd_mode_t mode)
-{
-    switch (mode)
-    {
-        case LCD_MODE_DISPLAY:
-            lcd_set_cur_blink(off, off);
-            break;
-
-        case LCD_MODE_INPUT:
-            lcd_set_cur_blink(on, on);
-            break;
-
-        default:
-            lcd_set_cur_blink(off, off);
-            break;
-    }
-}
-
-void lcd_show_1line(uint8_t line, const char* text)
-{
-    if (line > 1) return;
-
-    lcd_set_mode(LCD_MODE_DISPLAY);
-
-    lcd_cur_pos(0, line);
-    lcd_put_str("        ");
-
-    lcd_cur_pos(0, line);
-    lcd_put_str(text);
-}
-
-void lcd_show_2lines(const char* line1, const char* line2)
-{
-    lcd_clr();
-    lcd_set_mode(LCD_MODE_DISPLAY);
-
-    lcd_cur_pos(0, 0);
-    lcd_put_str(line1);
-
-    lcd_cur_pos(0, 1);
-    lcd_put_str(line2);
-}
-
-void lcd_show_input(const char* line1, const char* line2, uint8_t cursor_x, uint8_t cursor_y)
-{
-    lcd_clr();
-
-    lcd_cur_pos(0, 0);
-    lcd_put_str(line1);
-
-    lcd_cur_pos(0, 1);
-    lcd_put_str(line2);
-
-    lcd_cur_pos(cursor_x, cursor_y);
-    lcd_set_mode(LCD_MODE_INPUT);
 }
 

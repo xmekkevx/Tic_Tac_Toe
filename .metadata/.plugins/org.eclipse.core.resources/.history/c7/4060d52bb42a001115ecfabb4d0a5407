@@ -32,6 +32,7 @@
 #include <retarget_stdio.h>
 #include "i2c_lcd.h"
 #include "keyboard.h"
+
 #include "game.h"
 #include "ai.h"
 
@@ -74,9 +75,33 @@ void keyboard_callback(uint8_t key_val)
     HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 }
 
-void clearTerminal(void)
-{
+void clearTerminal() {
+    // ANSI Escape Codes:
+    // \033[2J  -> Löscht den gesamten Bildschirm
+    // \033[H   -> Setzt den Cursor oben links in die Ecke (Home)
     printf("\033[2J\033[H");
+}
+
+void lcd_show_1line(uint8_t line, char* text)
+{
+    if (line > 1) return;   // nur 0 oder 1 erlaubt
+
+    lcd_cur_pos(0, line);
+    lcd_put_str("        "); // 8 Leerzeichen = Zeile löschen
+
+    lcd_cur_pos(0, line);
+    lcd_put_str(text);
+}
+
+void lcd_show_2lines(char* line1, char* line2)
+{
+    lcd_clr();
+
+    lcd_cur_pos(0,0);
+    lcd_put_str(line1);
+
+    lcd_cur_pos(0,1);
+    lcd_put_str(line2);
 }
 
 char uart_getchar(void)
@@ -89,192 +114,217 @@ char uart_getchar(void)
 void lcd_show_player(char player)
 {
     char line1[9];
+    char line2[9];
 
-    snprintf(line1, sizeof(line1), "Turn: %c", player);
+    snprintf(line1, 9, "Start:%c", player);
+    snprintf(line2, 9, "Turn: %c", player);
 
-    lcd_show_2lines(line1, "");
+    lcd_show_2lines(line1, line2);
 }
 
-void greet(void)
-{
-    lcd_show_2lines("Welcome ", "to...  ");
-    HAL_Delay(2000);
 
-    lcd_show_2lines(" TicTac ", "  Toe! ");
-    HAL_Delay(2000);
+void greet() {
+
+	lcd_show_2lines("Welcome ", "to...  ");
+	HAL_Delay(2000);
+
+	lcd_show_2lines(" TicTac ", "  Toe! ");
+	HAL_Delay(2000);
+
+
+	lcd_clr();
+}
+
+
+int askStartGame() {
+
+    char choice;
+    char line2[16] = "(j/n): ";
 
     lcd_clr();
-}
+    lcd_cur_pos(0,0);
+    lcd_put_str("Start?");
 
-int askStartGame(void)
-{
-    char choice;
+    lcd_cur_pos(0,1);
+    lcd_put_str(line2);
 
-    lcd_show_input("Start?", "(y/n): ", 7, 1);
-
+    // Warten auf Taste
     choice = uart_getchar();
 
+    // Auf LCD anzeigen
+    int len = strlen(line2);
+
+    lcd_cur_pos(len, 1);
     lcd_putc(choice);
+
     HAL_Delay(500);
 
-    lcd_set_mode(LCD_MODE_DISPLAY); // Cursor wieder aus
-
-    if (choice == 'y' || choice == 'Y')
+    if (choice == 'j' || choice == 'J')
         return 1;
     else
         return 0;
 }
 
-int askReplay(void)
-{
+
+int askReplay() {
     char choice;
+    char line1[] = "Again?";
+    char line2[] = "(j/n): ";
 
-    lcd_show_input("Again?", "(y/n): ", 7, 1);
+    // 1. LCD vorbereiten
+    lcd_show_2lines(line1, line2);
 
+    // 2. Auf Taste warten (statt scanf)
     choice = uart_getchar();
 
+    // 3. Die Eingabe auf dem LCD anzeigen (hinter dem Text in Zeile 0)
+    // Wir setzen den Cursor ans Ende des Strings "Again? (j/n):"
+    lcd_cur_pos(strlen(line2), 1);
     lcd_putc(choice);
-    HAL_Delay(500);
 
-    lcd_set_mode(LCD_MODE_DISPLAY);
-
+    // 4. Auch im Terminal ausgeben (optional)
     printf("%c\r\n", choice);
 
+    // 5. Kurz warten, damit der User seine Eingabe auf dem LCD sieht
     HAL_Delay(1000);
 
-    if (choice == 'y' || choice == 'Y')
+    if (choice == 'j' || choice == 'J')
         return 1;
 
     return 0;
 }
 
-void startGame(Game *game)
-{
+
+void startGame(Game *game) {
+
     int input;
     int move;
 
-    lcd_show_2lines("Game", "starts!");
+    lcd_show_2lines("Game ", "starts!   ");
     HAL_Delay(2000);
-
     initGame(game);
 
+    /* Zufälliger Startspieler */
     if (rand() % 2 == 0)
         game->currentPlayer = 'X';
     else
         game->currentPlayer = 'O';
 
-    printf("\n============================\r\n");
-    printf("Neues Spiel startet\r\n");
-    printf("Startspieler: %c\r\n", game->currentPlayer);
-    printf("============================\r\n");
+
+    printf("\nStartspieler: %c\r\n", game->currentPlayer);
+    printf("%c ist am Zug!\r\n\r\n", game->currentPlayer);
 
     lcd_show_player(game->currentPlayer);
     HAL_Delay(1500);
 
-    while (1)
-    {
+
+    while (1) {
+
         printBoard(game);
 
-        if (game->currentPlayer == 'X')
-        {
-            printf("\r\nDein Zug!\r\n");
-            printf("Waehle Feld 1-9, Taste 13 = Korrektur, Taste 16 = Enter\r\n");
+        /* Mensch */
+        if (game->currentPlayer == 'X') {
+
+            printf("Dein Zug: 1-9 waehlen, 16=Enter, 13=Korr\r\n");
+            lcd_show_2lines("Ur turn:", "1-9 16=OK");
 
             input = keyboard_get_confirmed_move_1_to_9();
 
-            printf("Zug bestaetigt: Feld %d\r\n", input);
+            printf("Bestaetigt: %d\r\n", input);
 
-            if (!playerMove(game, input))
-            {
-                printf("Feld %d ist bereits belegt!\r\n", input);
+            if (!playerMove(game, input)) {
+                printf("Feld belegt!\r\n");
                 lcd_show_2lines("Field", "Taken! ");
-                HAL_Delay(1200);
+                HAL_Delay(1000);
                 continue;
             }
-
-            lcd_show_2lines("Chosen!", "");
-            HAL_Delay(800);
         }
-        else
-        {
-            printf("\r\nKI denkt...\r\n");
-            lcd_show_2lines("AI", "thinks...");
+
+        /* KI */
+        else {
+            printf("KI denkt...\r\n");
+            lcd_show_2lines("AI", "thinks...   ");
+
             HAL_Delay(2000);
 
             move = aiMove(game);
 
-            printf("KI waehlt Feld %d\r\n", move);
+            // Terminal Ausgabe
+            printf("KI waehlt: %d\r\n", move);
 
-            char aiMsg[9];
-            snprintf(aiMsg, sizeof(aiMsg), "%d", move);
+            // LCD Ausgabe vorbereiten
+            char aiMsg[9]; // Puffer für "AI: X   " (max 8 Zeichen + \0)
+            snprintf(aiMsg, 9, "%d", move);
 
+            // Auf dem LCD anzeigen
             lcd_show_2lines("AI move:", aiMsg);
-            HAL_Delay(1800);
+
+            HAL_Delay(2000);
 
             playerMove(game, move);
         }
 
-        if (checkWin(game, game->currentPlayer))
-        {
+        /* Sieg */
+        if (checkWin(game, game->currentPlayer)) {
+
             printBoard(game);
 
-            if (game->currentPlayer == 'X')
-            {
-                printf("\r\nDu hast gewonnen!\r\n");
-                lcd_show_2lines("You", "win!");
-                HAL_Delay(2000);
+
+            if (game->currentPlayer == 'X') {
+                printf("Du hast gewonnen!\r\n");
+            	lcd_show_2lines("You", "win!");
+            	HAL_Delay(2000);
+
             }
-            else
-            {
-                printf("\r\nDie KI gewinnt!\r\n");
-                lcd_show_2lines("AI", "wins!");
-                HAL_Delay(2000);
+            else {
+                printf("Gegner gewinnt!\r\n");
+            	lcd_show_2lines("AI", "wins!");
+            	HAL_Delay(2000);
+
+
             }
 
             break;
         }
 
-        if (isDraw(game))
-        {
+
+        /* Unentschieden */
+        if (isDraw(game)) {
+
             printBoard(game);
 
-            printf("\r\nUnentschieden!\r\n");
-            lcd_show_2lines("Draw!", "");
-            HAL_Delay(2000);
+
+            printf("Unentschieden!\r\n");
+        	lcd_show_2lines("Draw!", " ");
+        	HAL_Delay(2000);
+
+
+
 
             break;
         }
+
 
         switchPlayer(game);
-
-        if (game->currentPlayer == 'X')
-        {
-            printf("\r\nDu bist dran!\r\n");
-            lcd_show_player(game->currentPlayer);
-            HAL_Delay(1000);
-        }
-        else
-        {
-            printf("\r\nDie KI ist dran!\r\n");
-            lcd_show_player(game->currentPlayer);
-            HAL_Delay(1000);
-        }
     }
 }
 
-void printHelp(void)
-{
-    printf("\r\nPositionen:\r\n");
+
+void printHelp() {
+
+    printf("\nPositionen:\r\n");
+
     printf(" 1 | 2 | 3 \r\n");
+
     printf("---+---+---\r\n");
+
     printf(" 4 | 5 | 6 \r\n");
+
     printf("---+---+---\r\n");
-    printf(" 7 | 8 | 9 \r\n");
-    printf("\r\nBedienung SPI-Tastatur:\r\n");
-    printf(" 1-9  = Feld waehlen\r\n");
-    printf(" 13   = Korrektur\r\n");
-    printf(" 16   = Enter\r\n\r\n");
+
+    printf(" 7 | 8 | 9 \r\n\r\n");
 }
+
 /* USER CODE END 0 */
 
 /**
@@ -326,14 +376,10 @@ int main(void)
 
 
   if (!askStartGame()) {
-	  printf("Programm wurde beendet.\r\n");
-	  lcd_show_2lines("Program", "ended.");
-
-
+	  printf("Spiel wurde beendet.\r\n");
       return 0;
   }
 
-  clearTerminal();
   printHelp();
 
 
@@ -342,29 +388,31 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  startGame(&game);
+	startGame(&game);
 
-	      if (!askReplay())
-	      {
-	          printf("Programm wird beendet.\r\n");
-	          lcd_show_2lines("Program", "ended.");
-	          HAL_Delay(2000);
+	if (!askReplay()) {
 
-	          lcd_show_2lines("See you", "later!");
-	          HAL_Delay(2000);
 
-	          clearTerminal();
-	          lcd_clr();
-	          break;
-	      }
-	      else
-	      {
-	          clearTerminal();
-	          lcd_clr();
-	          printHelp();
-	      }
-	    }
 
+		printf("Programm wird beendet.\r\n");
+	    lcd_show_2lines("Program", "ended. ");
+    	HAL_Delay(2000);
+
+	    lcd_show_2lines("See you", "later! ");
+    	HAL_Delay(2000);
+
+	    clearTerminal(); // Terminal säubern
+		lcd_clr();       // LCD säubern
+
+
+
+		break;
+	} else {
+        // Wenn der Spieler nochmal will: Vor dem nächsten Durchlauf alles putzen!
+        clearTerminal();
+        lcd_clr();
+    }
+  }
   /* USER CODE END 3 */
 }
 

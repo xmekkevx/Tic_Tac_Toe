@@ -327,7 +327,7 @@ int main(void)
 
   if (!askStartGame()) {
 	  printf("Programm wurde beendet.\r\n");
-	  lcd_show_2lines("Program", "ended.");
+	  lcd_show_2lines("Program", "endend.");
 
 
       return 0;

@@ -28,14 +28,21 @@ static void keyboard_draw_selection(uint8_t selected)
 {
     char line2[9];
 
+    lcd_cur_pos(0, 0);
+    lcd_put_str("Ur turn:");
+
+    lcd_cur_pos(0, 1);
+    lcd_put_str("        ");
+
+    lcd_cur_pos(0, 1);
     if (selected == 0)
     {
-        lcd_show_input("Ur turn:", "        ", 0, 1);
+        lcd_put_str("        ");
     }
     else
     {
         snprintf(line2, sizeof(line2), "%d OK? ", selected);
-        lcd_show_input("Ur turn:", line2, 0, 1);
+        lcd_put_str(line2);
     }
 }
 

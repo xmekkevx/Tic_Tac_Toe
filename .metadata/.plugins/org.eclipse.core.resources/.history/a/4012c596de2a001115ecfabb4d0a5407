@@ -239,7 +239,7 @@ void startGame(Game *game)
             printBoard(game);
 
             printf("\r\nUnentschieden!\r\n");
-            lcd_show_2lines("Draw!", "");
+            lcd_show_2lines("Draw!", "No winner");
             HAL_Delay(2000);
 
             break;
@@ -326,10 +326,7 @@ int main(void)
 
 
   if (!askStartGame()) {
-	  printf("Programm wurde beendet.\r\n");
-	  lcd_show_2lines("Program", "ended.");
-
-
+	  printf("Spiel wurde beendet.\r\n");
       return 0;
   }
 

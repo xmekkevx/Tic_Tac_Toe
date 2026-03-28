@@ -79,6 +79,43 @@ void clearTerminal(void)
     printf("\033[2J\033[H");
 }
 
+void lcd_show_1line(uint8_t line, char* text)
+{
+    if (line > 1) return;
+
+    lcd_cur_pos(0, line);
+    lcd_put_str("        ");
+
+    lcd_cur_pos(0, line);
+    lcd_put_str(text);
+}
+
+void lcd_show_2lines(char* line1, char* line2)
+{
+    lcd_clr();
+    lcd_set_mode(LCD_MODE_DISPLAY);
+
+    lcd_cur_pos(0, 0);
+    lcd_put_str(line1);
+
+    lcd_cur_pos(0, 1);
+    lcd_put_str(line2);
+}
+
+void lcd_show_input(const char* line1, const char* line2, uint8_t cursor_x, uint8_t cursor_y)
+{
+    lcd_clr();
+
+    lcd_cur_pos(0, 0);
+    lcd_put_str((char*)line1);
+
+    lcd_cur_pos(0, 1);
+    lcd_put_str((char*)line2);
+
+    lcd_cur_pos(cursor_x, cursor_y);
+    lcd_set_mode(LCD_MODE_INPUT);
+}
+
 char uart_getchar(void)
 {
     char c;
@@ -89,10 +126,12 @@ char uart_getchar(void)
 void lcd_show_player(char player)
 {
     char line1[9];
+    char line2[9];
 
-    snprintf(line1, sizeof(line1), "Turn: %c", player);
+    snprintf(line1, sizeof(line1), "Start:%c", player);
+    snprintf(line2, sizeof(line2), "Turn: %c", player);
 
-    lcd_show_2lines(line1, "");
+    lcd_show_2lines(line1, line2);
 }
 
 void greet(void)
@@ -239,7 +278,7 @@ void startGame(Game *game)
             printBoard(game);
 
             printf("\r\nUnentschieden!\r\n");
-            lcd_show_2lines("Draw!", "");
+            lcd_show_2lines("Draw!", "No winner");
             HAL_Delay(2000);
 
             break;
@@ -249,13 +288,13 @@ void startGame(Game *game)
 
         if (game->currentPlayer == 'X')
         {
-            printf("\r\nDu bist dran!\r\n");
+            printf("\r\nJetzt bist du wieder dran.\r\n");
             lcd_show_player(game->currentPlayer);
             HAL_Delay(1000);
         }
         else
         {
-            printf("\r\nDie KI ist dran!\r\n");
+            printf("\r\nJetzt ist die KI dran.\r\n");
             lcd_show_player(game->currentPlayer);
             HAL_Delay(1000);
         }
@@ -326,10 +365,7 @@ int main(void)
 
 
   if (!askStartGame()) {
-	  printf("Programm wurde beendet.\r\n");
-	  lcd_show_2lines("Program", "ended.");
-
-
+	  printf("Spiel wurde beendet.\r\n");
       return 0;
   }
 

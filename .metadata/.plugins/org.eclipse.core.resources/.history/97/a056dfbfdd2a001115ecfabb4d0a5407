@@ -89,10 +89,11 @@ char uart_getchar(void)
 void lcd_show_player(char player)
 {
     char line1[9];
+    char line2[9];
 
-    snprintf(line1, sizeof(line1), "Turn: %c", player);
+    snprintf(line2, sizeof(line2), "Turn: %c", player);
 
-    lcd_show_2lines(line1, "");
+    lcd_show_2lines(line1, line2);
 }
 
 void greet(void)
@@ -239,7 +240,7 @@ void startGame(Game *game)
             printBoard(game);
 
             printf("\r\nUnentschieden!\r\n");
-            lcd_show_2lines("Draw!", "");
+            lcd_show_2lines("Draw!", "No winner");
             HAL_Delay(2000);
 
             break;
@@ -249,13 +250,13 @@ void startGame(Game *game)
 
         if (game->currentPlayer == 'X')
         {
-            printf("\r\nDu bist dran!\r\n");
+            printf("\r\nJetzt bist du wieder dran.\r\n");
             lcd_show_player(game->currentPlayer);
             HAL_Delay(1000);
         }
         else
         {
-            printf("\r\nDie KI ist dran!\r\n");
+            printf("\r\nJetzt ist die KI dran.\r\n");
             lcd_show_player(game->currentPlayer);
             HAL_Delay(1000);
         }
@@ -326,10 +327,7 @@ int main(void)
 
 
   if (!askStartGame()) {
-	  printf("Programm wurde beendet.\r\n");
-	  lcd_show_2lines("Program", "ended.");
-
-
+	  printf("Spiel wurde beendet.\r\n");
       return 0;
   }
 
