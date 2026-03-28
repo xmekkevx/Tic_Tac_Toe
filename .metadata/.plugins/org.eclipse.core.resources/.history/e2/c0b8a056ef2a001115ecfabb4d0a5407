@@ -218,26 +218,3 @@ uint8_t input_get_confirmed_move_1_to_9(void)
         }
     }
 }
-
-input_key_t input_get_menu_choice_1_to_3(void)
-{
-    input_key_t key;
-
-    while (1)
-    {
-        key = input_read_key_blocking();
-
-        if (key == INPUT_KEY_1 ||
-            key == INPUT_KEY_2 ||
-            key == INPUT_KEY_3)
-        {
-            return key;
-        }
-        else if (key == INPUT_KEY_HELP)
-        {
-            ui_clear_terminal();
-            ui_print_help();
-            printf("Menueauswahl: 1 = Einfach, 2 = Mittel, 3 = Schwer\r\n");
-        }
-    }
-}

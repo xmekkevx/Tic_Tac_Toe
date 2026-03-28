@@ -15,7 +15,6 @@ int ui_ask_yes_no_question(const char *terminal_text,
                            uint8_t cursor_y);
 
 void ui_show_player_turn(char player);
-void ui_show_ai_difficulty(AiDifficulty difficulty);
 void ui_show_game_start(char start_player);
 void ui_show_player_prompt(void);
 void ui_show_ai_thinking(void);

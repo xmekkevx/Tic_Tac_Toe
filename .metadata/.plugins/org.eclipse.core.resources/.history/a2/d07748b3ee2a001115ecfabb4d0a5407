@@ -3,18 +3,10 @@
 
 #define SIZE 3
 
-typedef enum
-{
-    AI_EASY = 0,
-    AI_MEDIUM,
-    AI_HARD
-} AiDifficulty;
-
 typedef struct {
     char board[SIZE][SIZE];
     int turnCounter;
     char currentPlayer;
-    AiDifficulty aiDifficulty;
 } Game;
 
 /* Initialisiert das Spielfeld */

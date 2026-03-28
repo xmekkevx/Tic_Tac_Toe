@@ -1,7 +1,6 @@
 #include "ui.h"
 #include "i2c_lcd.h"
 #include "input.h"
-#include "ai.h"
 #include <stdio.h>
 
 void ui_clear_terminal(void)
@@ -40,7 +39,6 @@ void ui_print_help(void)
 
 void ui_greet(void)
 {
-	ui_clear_terminal();
     lcd_show_2lines("Welcome ", "to...  ");
     printf("Herzlichen Willkommen zu Tic Tac Toe!\r\n");
     HAL_Delay(2000);
@@ -79,11 +77,6 @@ void ui_show_game_start(char start_player)
     printf("Das Spiel beginnt!\r\n");
     printf("Startspieler: %c\r\n", start_player);
     printf("============================\r\n");
-}
-
-void ui_show_ai_difficulty(AiDifficulty difficulty)
-{
-    printf("KI-Schwierigkeit: %s\r\n", aiDifficultyToString(difficulty));
 }
 
 void ui_show_player_prompt(void)

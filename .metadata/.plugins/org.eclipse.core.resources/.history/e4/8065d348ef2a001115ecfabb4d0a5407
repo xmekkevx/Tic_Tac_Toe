@@ -25,6 +25,5 @@ typedef enum
 void input_init(void);
 int input_get_yes_no(void);
 uint8_t input_get_confirmed_move_1_to_9(void);
-input_key_t input_get_menu_choice_1_to_3(void);
 
 #endif /* INC_INPUT_H_ */

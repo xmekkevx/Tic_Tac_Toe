@@ -289,6 +289,7 @@ int main(void)
   while (1)
   {
       ui_clear_terminal();
+      ui_print_help();
 
       game.aiDifficulty = askAiDifficulty();
 

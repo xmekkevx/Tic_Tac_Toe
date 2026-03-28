@@ -1,59 +1,144 @@
 #include <stdlib.h>
 #include "../Inc/ai.h"
 
-int aiMove(Game *game) {
+static int aiGetRandomMove(Game *game)
+{
+    int freeFields[9];
+    int count = 0;
+
+    for (int i = 1; i <= 9; i++) {
+        int row = (i - 1) / 3;
+        int col = (i - 1) % 3;
+
+        if (game->board[row][col] == ' ') {
+            freeFields[count] = i;
+            count++;
+        }
+    }
+
+    if (count == 0)
+        return -1;
+
+    return freeFields[rand() % count];
+}
+
+static int aiFindWinningMove(Game *game, char player)
+{
     int i, row, col;
 
-    // 1. Gewinnchance prüfen
     for (i = 1; i <= 9; i++) {
         row = (i - 1) / 3;
         col = (i - 1) % 3;
+
         if (game->board[row][col] == ' ') {
-            game->board[row][col] = game->currentPlayer;
-            if (checkWin(game, game->currentPlayer)) {
+            game->board[row][col] = player;
+
+            if (checkWin(game, player)) {
                 game->board[row][col] = ' ';
-                return i; // sofort gewinnen
+                return i;
             }
+
             game->board[row][col] = ' ';
         }
     }
 
-    // 2. Gegner blockieren
+    return -1;
+}
+
+static int aiMoveEasy(Game *game)
+{
+    return aiGetRandomMove(game);
+}
+
+static int aiMoveMedium(Game *game)
+{
+    int move;
     char opponent = (game->currentPlayer == 'X') ? 'O' : 'X';
-    for (i = 1; i <= 9; i++) {
-        row = (i - 1) / 3;
-        col = (i - 1) % 3;
-        if (game->board[row][col] == ' ') {
-            game->board[row][col] = opponent;
-            if (checkWin(game, opponent)) {
-                game->board[row][col] = ' ';
-                return i; // blockieren
-            }
-            game->board[row][col] = ' ';
-        }
-    }
 
-    // 3. Mitte nehmen
+    /* 1. Selbst gewinnen, wenn moeglich */
+    move = aiFindWinningMove(game, game->currentPlayer);
+    if (move != -1)
+        return move;
+
+    /* 2. Gegner blockieren */
+    move = aiFindWinningMove(game, opponent);
+    if (move != -1)
+        return move;
+
+    /* 3. Sonst zufaellig */
+    return aiGetRandomMove(game);
+}
+
+static int aiMoveHard(Game *game)
+{
+    int i, row, col;
+    int move;
+    char opponent = (game->currentPlayer == 'X') ? 'O' : 'X';
+
+    /* 1. Gewinnchance pruefen */
+    move = aiFindWinningMove(game, game->currentPlayer);
+    if (move != -1)
+        return move;
+
+    /* 2. Gegner blockieren */
+    move = aiFindWinningMove(game, opponent);
+    if (move != -1)
+        return move;
+
+    /* 3. Mitte nehmen */
     if (game->board[1][1] == ' ')
         return 5;
 
-    // 4. Ecken nehmen
+    /* 4. Ecken nehmen */
     int corners[] = {1, 3, 7, 9};
     for (i = 0; i < 4; i++) {
         row = (corners[i] - 1) / 3;
         col = (corners[i] - 1) % 3;
+
         if (game->board[row][col] == ' ')
             return corners[i];
     }
 
-    // 5. Seiten nehmen
+    /* 5. Seiten nehmen */
     int sides[] = {2, 4, 6, 8};
     for (i = 0; i < 4; i++) {
         row = (sides[i] - 1) / 3;
         col = (sides[i] - 1) % 3;
+
         if (game->board[row][col] == ' ')
             return sides[i];
     }
 
-    return -1; // kein Zug möglich
+    return -1;
+}
+
+int aiMove(Game *game)
+{
+    switch (game->aiDifficulty) {
+        case AI_EASY:
+            return aiMoveEasy(game);
+
+        case AI_MEDIUM:
+            return aiMoveMedium(game);
+
+        case AI_HARD:
+            return aiMoveHard(game);
+
+        default:
+            return aiMoveHard(game);
+    }
+}
+
+const char* aiDifficultyToString(AiDifficulty difficulty)
+{
+    switch (difficulty) {
+        case AI_EASY:
+            return "Einfach";
+        case AI_MEDIUM:
+            return "Mittel";
+        case AI_HARD:
+            return "Schwer";
+        default:
+            return "Unbekannt";
+    }
 }

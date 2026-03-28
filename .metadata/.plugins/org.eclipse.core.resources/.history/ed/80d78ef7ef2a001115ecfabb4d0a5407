@@ -108,7 +108,7 @@ AiDifficulty askAiDifficulty(void)
     printf("2 = Mittel\r\n");
     printf("3 = Schwer\r\n");
 
-    lcd_show_input("AI Level", "1/2/3?", 8, 1);
+    lcd_show_input("AI Level", "1/2/3?", 5, 1);
 
     while (1)
     {
@@ -157,7 +157,6 @@ void startGame(Game *game)
         game->currentPlayer = 'O';
 
     ui_show_game_start(game->currentPlayer);
-    ui_show_ai_difficulty(game->aiDifficulty);
     ui_show_player_turn(game->currentPlayer);
     HAL_Delay(1500);
 
@@ -286,32 +285,38 @@ int main(void)
       return 0;
   }
 
+  ui_clear_terminal();
+  ui_print_help();
+
+
   while (1)
   {
-      ui_clear_terminal();
+    /* USER CODE END WHILE */
 
-      game.aiDifficulty = askAiDifficulty();
+    /* USER CODE BEGIN 3 */
+	  startGame(&game);
 
-      ui_clear_terminal();
-      ui_print_help();
+	  if (!askReplay())
+	  {
+	      ui_show_program_end();
+	      HAL_Delay(2000);
 
-      startGame(&game);
+	      lcd_show_2lines("See you", "later!");
+	      printf("Bis bald!\r\n");
 
-      if (!askReplay())
-      {
-          ui_show_program_end();
-          HAL_Delay(2000);
+	      HAL_Delay(2000);
 
-          lcd_show_2lines("See you", "later!");
-          printf("Bis bald!\r\n");
-
-          HAL_Delay(2000);
-
-          ui_clear_terminal();
-          lcd_clr();
-          break;
-      }
-  }
+	      ui_clear_terminal();
+	      lcd_clr();
+	      break;
+	  }
+	  else
+	  {
+	      ui_clear_terminal();
+	      lcd_clr();
+	      ui_print_help();
+	  }
+	}
 
   /* USER CODE END 3 */
 }

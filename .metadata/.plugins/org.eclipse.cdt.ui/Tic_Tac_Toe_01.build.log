@@ -1,10 +1,10 @@
-22:35:56 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
+22:59:28 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
 make -j8 all 
 arm-none-eabi-size  Tic_Tac_Toe_01.elf 
    text	   data	    bss	    dec	    hex	filename
-  31036	    108	   2244	  33388	   826c	Tic_Tac_Toe_01.elf
+  32008	    108	   2244	  34360	   8638	Tic_Tac_Toe_01.elf
 Finished building: default.size.stdout
  
 
-22:35:56 Build Finished. 0 errors, 0 warnings. (took 429ms)
+22:59:29 Build Finished. 0 errors, 0 warnings. (took 444ms)
 
