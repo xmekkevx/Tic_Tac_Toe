@@ -17,14 +17,14 @@ void initGame(Game *game) {
 void printBoard(Game *game) {
     printf("\r\n");
 
-    printf("+---+---+---+\r\n");
     for (int i = 0; i < SIZE; i++) {
-        printf("| %c | %c | %c |\r\n",
+        printf(" %c | %c | %c \r\n",
                game->board[i][0],
                game->board[i][1],
                game->board[i][2]);
 
-        printf("+---+---+---+\r\n");
+        if (i < 2)
+            printf("---+---+---\r\n");
     }
 
     printf("\n");

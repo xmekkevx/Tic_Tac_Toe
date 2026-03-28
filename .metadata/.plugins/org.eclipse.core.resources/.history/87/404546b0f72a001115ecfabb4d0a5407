@@ -26,12 +26,12 @@ void ui_print_help(void)
     printf("+---------------------------------+\r\n");
 
     printf("| SPI-Tastatur:                   |\r\n");
-    printf("| 1-9       = Feld waehlen        |\r\n");
-    printf("| 11        = Yes                 |\r\n");
-    printf("| 12        = No                  |\r\n");
-    printf("| 13        = Korrektur           |\r\n");
-    printf("| 14        = Hilfe               |\r\n");
-    printf("| 16        = Enter               |\r\n");
+    printf("| 1-9  = Feld waehlen             |\r\n");
+    printf("| 11   = Yes                      |\r\n");
+    printf("| 12   = No                       |\r\n");
+    printf("| 13   = Korrektur                |\r\n");
+    printf("| 14   = Hilfe                    |\r\n");
+    printf("| 16   = Enter                    |\r\n");
 
     printf("+---------------------------------+\r\n");
 
