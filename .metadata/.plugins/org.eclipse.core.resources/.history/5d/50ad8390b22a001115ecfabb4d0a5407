@@ -14,16 +14,6 @@ static uint8_t keyrate = 0xff;
 /* nur intern im Modul sichtbar */
 static volatile uint8_t last_key_pressed = 0;
 
-static uint8_t keyboard_get_last_key(void)
-{
-    return last_key_pressed;
-}
-
-static void keyboard_clear_last_key(void)
-{
-    last_key_pressed = 0;
-}
-
 void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate)
 {
     keyboard_hspi = hspi;
@@ -50,10 +40,7 @@ void get_key_1ms(void)
             for (i = 0; i < 16; i++)
             {
                 if ((~spi_val) & (1 << i))
-                {
                     key = i + 1;
-                    break;
-                }
             }
         }
 
@@ -65,6 +52,16 @@ void get_key_1ms(void)
 
         lastkey = key;
     }
+}
+
+uint8_t keyboard_get_last_key(void)
+{
+    return last_key_pressed;
+}
+
+void keyboard_clear_last_key(void)
+{
+    last_key_pressed = 0;
 }
 
 uint8_t keyboard_get_key_blocking(void)
@@ -82,32 +79,18 @@ uint8_t keyboard_get_key_blocking(void)
     return key;
 }
 
-uint8_t keyboard_get_confirmed_move_1_to_9(void)
+uint8_t keyboard_get_move_1_to_9(void)
 {
-    uint8_t selected = 0;
     uint8_t key;
 
     while (1)
     {
         key = keyboard_get_key_blocking();
 
-        /* Zahl 1..9 auswählen */
         if (key >= 1 && key <= 9)
-        {
-            selected = key;
-        }
-        /* Taste 13 = Korrektur */
-        else if (key == 13)
-        {
-            selected = 0;
-        }
-        /* Taste 16 = Enter / Übernahme */
-        else if (key == 16)
-        {
-            if (selected >= 1 && selected <= 9)
-            {
-                return selected;
-            }
-        }
+            return key;
     }
 }
+
+
+

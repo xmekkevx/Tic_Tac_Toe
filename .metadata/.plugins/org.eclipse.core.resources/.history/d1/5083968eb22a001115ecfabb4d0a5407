@@ -71,7 +71,6 @@ void SystemClock_Config(void);
 
 void keyboard_callback(uint8_t key_val)
 {
-    (void)key_val;
     HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 }
 
@@ -225,12 +224,12 @@ void startGame(Game *game) {
         /* Mensch */
         if (game->currentPlayer == 'X') {
 
-            printf("Dein Zug: 1-9 waehlen, 16=Enter, 13=Korr\r\n");
-            lcd_show_2lines("Ur turn:", "1-9 16=OK");
+            printf("Dein Zug (1-9): ");
+            lcd_show_2lines("Ur turn:", "Press 1-9");
 
-            input = keyboard_get_confirmed_move_1_to_9();
+            input = keyboard_get_move_1_to_9();
 
-            printf("Bestaetigt: %d\r\n", input);
+            printf("%d\r\n", input);
 
             if (!playerMove(game, input)) {
                 printf("Feld belegt!\r\n");
