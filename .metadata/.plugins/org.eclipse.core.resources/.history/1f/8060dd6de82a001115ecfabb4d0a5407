@@ -98,8 +98,8 @@ void lcd_show_player(char player)
 
 void greet(void)
 {
-    lcd_show_2lines("Welcome ", "to...  ");
 	printf("Herzlichen Willkommen zu Tic Tac Toe!\r\n");
+    lcd_show_2lines("Welcome ", "to...  ");
     HAL_Delay(2000);
 
     lcd_show_2lines(" TicTac ", "  Toe! ");
@@ -113,7 +113,7 @@ int askStartGame(void)
     printf("Moechtest du das Spiel starten?\r\n");
     printf("Ja: y oder Taste 11 | Nein: n oder Taste 12\r\n");
 
-    lcd_show_input("Start?", "Y/N ?", 79, 1);
+    lcd_show_input("Start?", "Y/N ?", 7, 1);
 
     return input_get_yes_no();
 }

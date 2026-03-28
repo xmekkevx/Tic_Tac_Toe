@@ -98,8 +98,8 @@ void lcd_show_player(char player)
 
 void greet(void)
 {
-    lcd_show_2lines("Welcome ", "to...  ");
 	printf("Herzlichen Willkommen zu Tic Tac Toe!\r\n");
+    lcd_show_2lines("Welcome ", "to...  ");
     HAL_Delay(2000);
 
     lcd_show_2lines(" TicTac ", "  Toe! ");
@@ -110,22 +110,46 @@ void greet(void)
 
 int askStartGame(void)
 {
-    printf("Moechtest du das Spiel starten?\r\n");
-    printf("Ja: y oder Taste 11 | Nein: n oder Taste 12\r\n");
+    char choice;
 
-    lcd_show_input("Start?", "Y/N ?", 79, 1);
+	printf("Moechtest du das Spiel starten?\r\n");
+    lcd_show_input("Start?", "(y/n): ", 7, 1);
 
-    return input_get_yes_no();
+    choice = uart_getchar();
+
+    lcd_putc(choice);
+    HAL_Delay(500);
+
+    lcd_set_mode(LCD_MODE_DISPLAY); // Cursor wieder aus
+
+    if (choice == 'y' || choice == 'Y')
+        return 1;
+    else
+        return 0;
 }
 
 int askReplay(void)
 {
+    char choice;
+
     printf("Moechtest du noch einmal spielen?\r\n");
-    printf("Ja: y oder Taste 11 | Nein: n oder Taste 12\r\n");
+    lcd_show_input("Again?", "(y/n): ", 7, 1);
 
-    lcd_show_input("Again?", "Y/N ?", 7, 1);
+    choice = uart_getchar();
 
-    return input_get_yes_no();
+    lcd_putc(choice);
+    HAL_Delay(500);
+
+    lcd_set_mode(LCD_MODE_DISPLAY);
+
+    printf("%c\r\n", choice);
+
+    HAL_Delay(1000);
+
+    if (choice == 'y' || choice == 'Y')
+        return 1;
+
+    return 0;
 }
 
 void startGame(Game *game)

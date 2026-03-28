@@ -36,8 +36,6 @@ static input_key_t input_map_spi_key(uint8_t key)
         case 7:  return INPUT_KEY_7;
         case 8:  return INPUT_KEY_8;
         case 9:  return INPUT_KEY_9;
-        case 11: return INPUT_KEY_YES;
-        case 12: return INPUT_KEY_NO;
         case 13: return INPUT_KEY_BACKSPACE;
         case 14: return INPUT_KEY_HELP;
         case 16: return INPUT_KEY_ENTER;
@@ -58,12 +56,6 @@ static input_key_t input_map_uart_char(char c)
         case '7': return INPUT_KEY_7;
         case '8': return INPUT_KEY_8;
         case '9': return INPUT_KEY_9;
-
-        case 'y':
-        case 'Y': return INPUT_KEY_YES;
-
-        case 'n':
-        case 'N': return INPUT_KEY_NO;
 
         case '\b': return INPUT_KEY_BACKSPACE;
         case 127:  return INPUT_KEY_BACKSPACE;
@@ -123,39 +115,6 @@ void input_init(void)
     /* aktuell nichts noetig */
 }
 
-int input_get_yes_no(void)
-{
-    input_key_t key;
-
-    while (1)
-    {
-        key = input_read_key_blocking();
-
-        if (key == INPUT_KEY_YES)
-        {
-            lcd_putc('Y');
-            HAL_Delay(500);
-            lcd_set_mode(LCD_MODE_DISPLAY);
-            printf("Ja ausgewaehlt.\r\n");
-            return 1;
-        }
-        else if (key == INPUT_KEY_NO)
-        {
-            lcd_putc('N');
-            HAL_Delay(500);
-            lcd_set_mode(LCD_MODE_DISPLAY);
-            printf("Nein ausgewaehlt.\r\n");
-            return 0;
-        }
-        else if (key == INPUT_KEY_HELP)
-        {
-            clearTerminal();
-            printHelp();
-            printf("Ja/Nein-Frage: Taste 11 = Yes, Taste 12 = No, oder y/n ueber UART.\r\n");
-        }
-    }
-}
-
 uint8_t input_get_confirmed_move_1_to_9(void)
 {
     uint8_t selected = 0;
@@ -188,7 +147,6 @@ uint8_t input_get_confirmed_move_1_to_9(void)
             input_draw_selection(selected);
             printf("Korrektur: Auswahl geloescht\r\n");
         }
-
         else if (key == INPUT_KEY_HELP)
         {
             clearTerminal();

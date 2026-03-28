@@ -100,6 +100,7 @@ void greet(void)
 {
     lcd_show_2lines("Welcome ", "to...  ");
 	printf("Herzlichen Willkommen zu Tic Tac Toe!\r\n");
+
     HAL_Delay(2000);
 
     lcd_show_2lines(" TicTac ", "  Toe! ");
