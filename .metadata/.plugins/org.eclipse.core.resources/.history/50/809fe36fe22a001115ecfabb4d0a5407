@@ -10,8 +10,6 @@
 #include "i2c_lcd.h"
 #include <stdio.h>
 
-void printHelp(void);
-
 static SPI_HandleTypeDef *keyboard_hspi = NULL;
 static uint8_t keyrate = 0xff;
 static volatile uint8_t last_key_pressed = 0;
@@ -130,11 +128,6 @@ uint8_t keyboard_get_confirmed_move_1_to_9(void)
             selected = 0;
             keyboard_draw_selection(selected);
             printf("Korrektur: Auswahl geloescht\r\n");
-        }
-        else if (key == 14)
-        {
-            printHelp();
-            keyboard_draw_selection(selected);
         }
         else if (key == 16)
         {

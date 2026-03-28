@@ -264,7 +264,6 @@ void startGame(Game *game)
 
 void printHelp(void)
 {
-    printf("\n==============HILFE==============\r\n");
     printf("\r\nPositionen:\r\n");
     printf(" 1 | 2 | 3 \r\n");
     printf("---+---+---\r\n");
@@ -276,8 +275,6 @@ void printHelp(void)
     printf(" 13   = Korrektur\r\n");
     printf(" 14   = Hilfe\r\n");
     printf(" 16   = Enter\r\n\r\n");
-    printf("\n==============HILFE==============\r\n");
-
 }
 /* USER CODE END 0 */
 

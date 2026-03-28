@@ -10,8 +10,6 @@
 #include "i2c_lcd.h"
 #include <stdio.h>
 
-void printHelp(void);
-
 static SPI_HandleTypeDef *keyboard_hspi = NULL;
 static uint8_t keyrate = 0xff;
 static volatile uint8_t last_key_pressed = 0;
@@ -108,9 +106,13 @@ uint8_t keyboard_get_confirmed_move_1_to_9(void)
     lcd_clr();
     keyboard_draw_selection(selected);
 
+    printf("Bitte waehlen: 1-9 = Feld, 13 = Korrektur, 16 = Enter\r\n");
+
     while (1)
     {
         key = keyboard_get_key_blocking();
+
+        printf("Taste gedrueckt: %d\r\n", key);
 
         if (key >= 1 && key <= 9)
         {
@@ -131,11 +133,6 @@ uint8_t keyboard_get_confirmed_move_1_to_9(void)
             keyboard_draw_selection(selected);
             printf("Korrektur: Auswahl geloescht\r\n");
         }
-        else if (key == 14)
-        {
-            printHelp();
-            keyboard_draw_selection(selected);
-        }
         else if (key == 16)
         {
             if (selected >= 1 && selected <= 9)
@@ -154,7 +151,7 @@ uint8_t keyboard_get_confirmed_move_1_to_9(void)
         }
         else
         {
-            printf("Ungültige Taste!\r\n", key);
+            printf("Taste %d wird ignoriert\r\n", key);
         }
     }
 }

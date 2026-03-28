@@ -167,7 +167,7 @@ void startGame(Game *game)
         game->currentPlayer = 'O';
 
     printf("\n============================\r\n");
-    printf("Das Spiel beginnt!\r\n");
+    printf("Neues Spiel startet\r\n");
     printf("Startspieler: %c\r\n", game->currentPlayer);
     printf("============================\r\n");
 
@@ -181,10 +181,9 @@ void startGame(Game *game)
         if (game->currentPlayer == 'X')
         {
             printf("\r\nDu bist dran!\r\n");
-            printf("Waehle Feld 1-9, Taste 13 = Korrektur, Taste 14 = Hilfe, Taste 16 = Enter\r\n");
+            printf("Waehle Feld 1-9, Taste 13 = Korrektur, Taste 16 = Enter\r\n");
 
             input = keyboard_get_confirmed_move_1_to_9();
-
 
             if (!playerMove(game, input))
             {
@@ -199,6 +198,7 @@ void startGame(Game *game)
         }
         else
         {
+        	clearTerminal();
             printf("\r\nKI denkt...\r\n");
             lcd_show_2lines("AI", "thinks...");
             HAL_Delay(2000);
@@ -264,7 +264,6 @@ void startGame(Game *game)
 
 void printHelp(void)
 {
-    printf("\n==============HILFE==============\r\n");
     printf("\r\nPositionen:\r\n");
     printf(" 1 | 2 | 3 \r\n");
     printf("---+---+---\r\n");
@@ -274,10 +273,7 @@ void printHelp(void)
     printf("\r\nBedienung SPI-Tastatur:\r\n");
     printf(" 1-9  = Feld waehlen\r\n");
     printf(" 13   = Korrektur\r\n");
-    printf(" 14   = Hilfe\r\n");
     printf(" 16   = Enter\r\n\r\n");
-    printf("\n==============HILFE==============\r\n");
-
 }
 /* USER CODE END 0 */
 

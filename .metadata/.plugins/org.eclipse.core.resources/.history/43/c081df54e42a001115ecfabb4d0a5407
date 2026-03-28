@@ -199,6 +199,7 @@ void startGame(Game *game)
         }
         else
         {
+        	clearTerminal();
             printf("\r\nKI denkt...\r\n");
             lcd_show_2lines("AI", "thinks...");
             HAL_Delay(2000);

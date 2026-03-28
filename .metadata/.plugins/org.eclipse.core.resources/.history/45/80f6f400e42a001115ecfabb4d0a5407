@@ -176,7 +176,11 @@ void startGame(Game *game)
 
     while (1)
     {
+        clearTerminal();
+        printHelp();
         printBoard(game);
+
+        printf("\r\nAktueller Spieler: %c\r\n", game->currentPlayer);
 
         if (game->currentPlayer == 'X')
         {
