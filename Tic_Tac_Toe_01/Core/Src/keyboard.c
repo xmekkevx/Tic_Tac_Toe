@@ -1,16 +1,6 @@
-/*
- * keyboard.c
- *
- *  Created on: Mar 28, 2026
- *      Author: a911353
- */
-
 #include "main.h"
 #include "keyboard.h"
-#include "i2c_lcd.h"
 #include <stdio.h>
-
-void printHelp(void);
 
 static SPI_HandleTypeDef *keyboard_hspi = NULL;
 static uint8_t keyrate = 0xff;
@@ -24,21 +14,6 @@ static uint8_t keyboard_get_last_key(void)
 static void keyboard_clear_last_key(void)
 {
     last_key_pressed = 0;
-}
-
-static void keyboard_draw_selection(uint8_t selected)
-{
-    char line2[9];
-
-    if (selected == 0)
-    {
-        lcd_show_input("Ur turn:", "        ", 0, 1);
-    }
-    else
-    {
-        snprintf(line2, sizeof(line2), "%d OK? ", selected);
-        lcd_show_input("Ur turn:", line2, 0, 1);
-    }
 }
 
 void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate)
@@ -85,76 +60,29 @@ void get_key_1ms(void)
     }
 }
 
+uint8_t keyboard_get_key_nonblocking(void)
+{
+    get_key_1ms();
+
+    if (keyboard_get_last_key() != 0)
+    {
+        uint8_t key = keyboard_get_last_key();
+        keyboard_clear_last_key();
+        return key;
+    }
+
+    return 0;
+}
+
 uint8_t keyboard_get_key_blocking(void)
 {
-    keyboard_clear_last_key();
+    uint8_t key = 0;
 
-    while (keyboard_get_last_key() == 0)
+    while (key == 0)
     {
-        get_key_1ms();
+        key = keyboard_get_key_nonblocking();
         HAL_Delay(1);
     }
 
-    uint8_t key = keyboard_get_last_key();
-    keyboard_clear_last_key();
     return key;
-}
-
-uint8_t keyboard_get_confirmed_move_1_to_9(void)
-{
-    uint8_t selected = 0;
-    uint8_t key;
-
-    lcd_clr();
-    keyboard_draw_selection(selected);
-
-    while (1)
-    {
-        key = keyboard_get_key_blocking();
-
-        if (key >= 1 && key <= 9)
-        {
-            if (selected == 0)
-            {
-                selected = key;
-                keyboard_draw_selection(selected);
-                printf("Aktuelle Auswahl: %d\r\n", selected);
-            }
-            else
-            {
-                printf("Auswahl %d bereits gesetzt. Erst Taste 13 fuer Korrektur druecken.\r\n", selected);
-            }
-        }
-        else if (key == 13)
-        {
-            selected = 0;
-            keyboard_draw_selection(selected);
-            printf("Korrektur: Auswahl geloescht\r\n");
-        }
-        else if (key == 14)
-        {
-            printHelp();
-            keyboard_draw_selection(selected);
-        }
-        else if (key == 16)
-        {
-            if (selected >= 1 && selected <= 9)
-            {
-                printf("Eingabe bestaetigt: %d\r\n", selected);
-                return selected;
-            }
-            else
-            {
-                printf("Noch keine gueltige Auswahl vorhanden\r\n");
-                lcd_cur_pos(0, 1);
-                lcd_put_str("No sel! ");
-                HAL_Delay(700);
-                keyboard_draw_selection(selected);
-            }
-        }
-        else
-        {
-            printf("Ungültige Taste!\r\n", key);
-        }
-    }
 }

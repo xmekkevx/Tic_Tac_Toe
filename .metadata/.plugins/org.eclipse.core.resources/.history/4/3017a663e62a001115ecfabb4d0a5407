@@ -182,7 +182,7 @@ void startGame(Game *game)
         if (game->currentPlayer == 'X')
         {
             printf("\r\nDu bist dran!\r\n");
-            printf("Waehle Feld 1-9, Taste 13/Backspace = Korrektur, Taste 14/h = Hilfe, Taste 16/Enter = Eingabe\r\n");
+            printf("Waehle Feld 1-9, Taste 13 = Korrektur, Taste 14 = Hilfe, Taste 16 = Enter\r\n");
 
             input = input_get_confirmed_move_1_to_9();
 
