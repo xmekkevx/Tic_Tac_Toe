@@ -145,19 +145,14 @@ void startGame(Game *game)
 
             if (game->currentPlayer == 'X')
             {
-                ui_show_player_win();
-                ring_game_animate_x_win();
-                HAL_Delay(1000);
+            	ui_show_player_win();
+            	HAL_Delay(2000);
             }
             else
             {
-                ui_show_ai_win();
-                ring_game_animate_o_win();
-                HAL_Delay(1000);
+            	ui_show_ai_win();
+            	HAL_Delay(2000);
             }
-
-            ring_game_clear();
-
 
             break;
         }
@@ -167,7 +162,7 @@ void startGame(Game *game)
             printBoard(game);
 
             ui_show_draw();
-            ring_game_clear();
+            ring_game_show_draw();
             HAL_Delay(2000);
 
             break;

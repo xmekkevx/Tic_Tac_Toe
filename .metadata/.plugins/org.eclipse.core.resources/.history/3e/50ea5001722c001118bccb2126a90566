@@ -140,7 +140,7 @@ void ring_game_update_turns(uint8_t turn_count)
     ring_game_push_state_to_ring();
 }
 
-void ring_game_clear(void)
+void ring_game_show_draw(void)
 {
     ring_game_clear_state();
     ring_game_push_state_to_ring();

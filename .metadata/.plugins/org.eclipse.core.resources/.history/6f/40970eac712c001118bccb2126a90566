@@ -156,9 +156,6 @@ void startGame(Game *game)
                 HAL_Delay(1000);
             }
 
-            ring_game_clear();
-
-
             break;
         }
 
@@ -167,7 +164,7 @@ void startGame(Game *game)
             printBoard(game);
 
             ui_show_draw();
-            ring_game_clear();
+            ring_game_show_draw();
             HAL_Delay(2000);
 
             break;
