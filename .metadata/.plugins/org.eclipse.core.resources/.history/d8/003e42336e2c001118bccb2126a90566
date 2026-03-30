@@ -1,0 +1,38 @@
+/*
+ * neopixel.c
+ */
+
+#include "neopixel.h"
+#include "tim.h"
+
+volatile uint32_t CCR_Buffer[24 + 50];   // 24 Bit + Reset-Zeit
+
+void set_color(uint8_t red, uint8_t green, uint8_t blue)
+{
+    uint32_t led_data = ((uint32_t)green << 16) |
+                        ((uint32_t)red   << 8 ) |
+                        ((uint32_t)blue);
+
+    for (int i = 0; i < 24; i++)
+    {
+        if (led_data & (1UL << (23 - i)))   // MSB zuerst
+            CCR_Buffer[i] = 20;             // logisch 1
+        else
+            CCR_Buffer[i] = 10;             // logisch 0
+    }
+
+    for (int i = 24; i < 74; i++)
+    {
+        CCR_Buffer[i] = 0;                  // Reset > 50 us
+    }
+
+    HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t*)CCR_Buffer, 74);
+}
+
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2)
+    {
+        HAL_TIM_PWM_Stop_DMA(&htim2, TIM_CHANNEL_1);
+    }
+}

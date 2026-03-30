@@ -97,9 +97,6 @@ void startGame(Game *game)
     else
         game->currentPlayer = 'O';
 
-    ring_game_init();
-    ring_game_show_start_player(game->currentPlayer);
-
     ui_show_game_start(game->currentPlayer);
     ui_show_ai_difficulty(game->aiDifficulty);
     ui_show_player_turn(game->currentPlayer);
@@ -123,7 +120,6 @@ void startGame(Game *game)
 
             ui_show_player_chosen();
             HAL_Delay(800);
-            ring_game_update_turns(game->turnCounter);
         }
         else
         {
@@ -136,7 +132,6 @@ void startGame(Game *game)
             HAL_Delay(1800);
 
             playerMove(game, move);
-            ring_game_update_turns(game->turnCounter);
         }
 
         if (checkWin(game, game->currentPlayer))
@@ -162,7 +157,6 @@ void startGame(Game *game)
             printBoard(game);
 
             ui_show_draw();
-            ring_game_show_draw();
             HAL_Delay(2000);
 
             break;
@@ -223,16 +217,38 @@ int main(void)
   ui_greet();
 
   neopixel_init();
+  HAL_Delay(500);
 
-  Game game;
+  neopixel_fill(255, 0, 0);
+  neopixel_show();
+  HAL_Delay(1000);
 
-  srand(HAL_GetTick());
+  neopixel_fill(0, 255, 0);
+  neopixel_show();
+  HAL_Delay(1000);
 
-  if (!ui_ask_start_game()) {
-      ui_show_program_end();
-      return 0;
+  neopixel_fill(0, 0, 255);
+  neopixel_show();
+  HAL_Delay(1000);
+
+  neopixel_clear();
+  neopixel_show();
+  HAL_Delay(1000);
+
+  for (uint8_t i = 0; i < NEOPIXEL_LED_COUNT; i++)
+  {
+      neopixel_clear();
+      neopixel_set_led(i, 255, 0, 0);
+      neopixel_show();
+      HAL_Delay(300);
   }
 
+  neopixel_clear();
+  neopixel_show();
+
+  while (1)
+  {
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -245,20 +261,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	ui_prepare_new_game_screen();
-
-	game.aiDifficulty = ui_ask_ai_difficulty();
-
-	ui_prepare_new_game_screen();
-
-	startGame(&game);
-
-	if (!ui_ask_replay())
-	{
-		ui_show_goodbye();
-		break;
-	}
-
 
 
   }

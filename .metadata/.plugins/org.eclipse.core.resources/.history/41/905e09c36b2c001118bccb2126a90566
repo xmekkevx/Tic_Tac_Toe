@@ -39,8 +39,6 @@
 #include "ai.h"
 #include "input.h"
 #include "ui.h"
-#include "neopixel.h"
-#include "ring_game.h"
 
 /* USER CODE END Includes */
 
@@ -97,9 +95,6 @@ void startGame(Game *game)
     else
         game->currentPlayer = 'O';
 
-    ring_game_init();
-    ring_game_show_start_player(game->currentPlayer);
-
     ui_show_game_start(game->currentPlayer);
     ui_show_ai_difficulty(game->aiDifficulty);
     ui_show_player_turn(game->currentPlayer);
@@ -123,7 +118,6 @@ void startGame(Game *game)
 
             ui_show_player_chosen();
             HAL_Delay(800);
-            ring_game_update_turns(game->turnCounter);
         }
         else
         {
@@ -136,7 +130,6 @@ void startGame(Game *game)
             HAL_Delay(1800);
 
             playerMove(game, move);
-            ring_game_update_turns(game->turnCounter);
         }
 
         if (checkWin(game, game->currentPlayer))
@@ -162,7 +155,6 @@ void startGame(Game *game)
             printBoard(game);
 
             ui_show_draw();
-            ring_game_show_draw();
             HAL_Delay(2000);
 
             break;
@@ -221,30 +213,26 @@ int main(void)
   input_init();
 
   ui_greet();
+  /* USER CODE END 2 */
 
-  neopixel_init();
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
 
   Game game;
 
   srand(HAL_GetTick());
 
   if (!ui_ask_start_game()) {
-      ui_show_program_end();
-      return 0;
+       ui_show_program_end();
+       return 0;
   }
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-
-
 
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
 	ui_prepare_new_game_screen();
 
 	game.aiDifficulty = ui_ask_ai_difficulty();
@@ -255,12 +243,9 @@ int main(void)
 
 	if (!ui_ask_replay())
 	{
-		ui_show_goodbye();
-		break;
+	     ui_show_goodbye();
+	     break;
 	}
-
-
-
   }
   /* USER CODE END 3 */
 }

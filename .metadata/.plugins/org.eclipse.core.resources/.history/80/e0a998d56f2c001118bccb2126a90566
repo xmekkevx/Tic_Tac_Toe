@@ -245,20 +245,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	ui_prepare_new_game_screen();
-
-	game.aiDifficulty = ui_ask_ai_difficulty();
-
-	ui_prepare_new_game_screen();
-
-	startGame(&game);
-
-	if (!ui_ask_replay())
-	{
-		ui_show_goodbye();
-		break;
-	}
-
 
 
   }
