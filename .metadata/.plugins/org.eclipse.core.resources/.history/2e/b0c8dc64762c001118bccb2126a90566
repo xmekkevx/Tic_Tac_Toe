@@ -111,11 +111,7 @@ void startGame(Game *game)
 
     initGame(game);
 
-    uint32_t start_random = 0;
-
-    HAL_RNG_GenerateRandomNumber(&hrng, &start_random);
-
-    if ((start_random & 0x01u) == 0u)
+    if (rand() % 2 == 0)
         game->currentPlayer = 'X';
     else
         game->currentPlayer = 'O';
@@ -256,6 +252,8 @@ int main(void)
   MX_RNG_Init();
 
   Game game;
+
+  srand(HAL_GetTick());
 
   if (!ui_ask_start_game()) {
       ui_show_program_end();

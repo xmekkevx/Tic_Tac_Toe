@@ -111,11 +111,7 @@ void startGame(Game *game)
 
     initGame(game);
 
-    uint32_t start_random = 0;
-
-    HAL_RNG_GenerateRandomNumber(&hrng, &start_random);
-
-    if ((start_random & 0x01u) == 0u)
+    if (rand() % 2 == 0)
         game->currentPlayer = 'X';
     else
         game->currentPlayer = 'O';
@@ -243,19 +239,26 @@ int main(void)
   MX_RNG_Init();
   /* USER CODE BEGIN 2 */
 
+  MX_RNG_Init();
+
   RetargetInit(&huart2);
+
+  printf("RNG Test 1..6: %lu\r\n", random_int(1, 6));
+  printf("RNG Test 1..6: %lu\r\n", random_int(1, 6));
+  printf("RNG Test 1..6: %lu\r\n", random_int(1, 6));
 
   lcd_init(&hi2c1);
   keyboard_init(&hspi1, 10);
   input_init();
 
-  ui_greet();
 
   neopixel_init();
 
-  MX_RNG_Init();
+
 
   Game game;
+
+  srand(HAL_GetTick());
 
   if (!ui_ask_start_game()) {
       ui_show_program_end();
