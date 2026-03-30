@@ -213,33 +213,36 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   Game game;
 
-  srand(time(NULL));
-
+  srand(HAL_GetTick());
 
   if (!ui_ask_start_game()) {
-      ui_show_program_end();
-      return 0;
+       ui_show_program_end();
+       return 0;
   }
 
   while (1)
   {
-	  ui_prepare_new_game_screen();
+    /* USER CODE END WHILE */
 
-	  game.aiDifficulty = ui_ask_ai_difficulty();
+    /* USER CODE BEGIN 3 */
 
-	  ui_prepare_new_game_screen();
+	ui_prepare_new_game_screen();
 
-      startGame(&game);
+	game.aiDifficulty = ui_ask_ai_difficulty();
 
-      if (!ui_ask_replay())
-      {
-          ui_show_goodbye();
-          break;
-      }
+	ui_prepare_new_game_screen();
+
+	startGame(&game);
+
+	if (!ui_ask_replay())
+	{
+	     ui_show_goodbye();
+	     break;
+	}
   }
-
   /* USER CODE END 3 */
 }
 

@@ -1,14 +1,20 @@
-23:44:37 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
+20:49:27 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
 make -j8 all 
+arm-none-eabi-gcc -o "Tic_Tac_Toe_01.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\a911353\Desktop\6. Semester\Eingebettete Systeme\Prüfungsleistung\Tic_Tac_Toe_01\STM32L412KBUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Tic_Tac_Toe_01.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Tic_Tac_Toe_01.elf
+ 
 arm-none-eabi-size  Tic_Tac_Toe_01.elf 
+arm-none-eabi-objdump -h -S Tic_Tac_Toe_01.elf  > "Tic_Tac_Toe_01.list"
    text	   data	    bss	    dec	    hex	filename
-  32424	    108	   2244	  34776	   87d8	Tic_Tac_Toe_01.elf
+  32312	    108	   2244	  34664	   8768	Tic_Tac_Toe_01.elf
 Finished building: default.size.stdout
  
-23:44:40 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
+Finished building: Tic_Tac_Toe_01.list
+ 
+20:49:33 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
 make -j8 all 
 arm-none-eabi-size  Tic_Tac_Toe_01.elf 
    text	   data	    bss	    dec	    hex	filename
-  32424	    108	   2244	  34776	   87d8	Tic_Tac_Toe_01.elf
+  32312	    108	   2244	  34664	   8768	Tic_Tac_Toe_01.elf
 Finished building: default.size.stdout
  
