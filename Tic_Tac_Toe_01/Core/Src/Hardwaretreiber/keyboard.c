@@ -1,0 +1,87 @@
+#include <Hardwaretreiber/keyboard.h>
+#include "main.h"
+#include <stdio.h>
+
+static SPI_HandleTypeDef *keyboard_hspi = NULL;
+static uint8_t keyrate = 0xff;
+static volatile uint8_t last_key_pressed = 0;
+
+static uint8_t keyboard_get_last_key(void)
+{
+    return last_key_pressed;
+}
+
+static void keyboard_clear_last_key(void)
+{
+    last_key_pressed = 0;
+}
+
+void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate)
+{
+    keyboard_hspi = hspi;
+    keyrate = ms_rate;
+}
+
+void get_key_1ms(void)
+{
+    static uint8_t ms_counter = 0;
+    static uint8_t key = 0;
+    static uint8_t lastkey = 0;
+    uint8_t i;
+    uint16_t spi_val = 0;
+
+    ms_counter++;
+    if (ms_counter > keyrate)
+    {
+        ms_counter = 0;
+
+        if (keyboard_hspi != NULL)
+        {
+            HAL_SPI_Receive(keyboard_hspi, (uint8_t*)&spi_val, 1, 50);
+
+            key = 0;
+            for (i = 0; i < 16; i++)
+            {
+                if ((~spi_val) & (1 << i))
+                {
+                    key = i + 1;
+                    break;
+                }
+            }
+        }
+
+        if ((key != 0) && (lastkey == 0))
+        {
+            last_key_pressed = key;
+        }
+
+        lastkey = key;
+    }
+}
+
+uint8_t keyboard_get_key_nonblocking(void)
+{
+    get_key_1ms();
+
+    if (keyboard_get_last_key() != 0)
+    {
+        uint8_t key = keyboard_get_last_key();
+        keyboard_clear_last_key();
+        return key;
+    }
+
+    return 0;
+}
+
+uint8_t keyboard_get_key_blocking(void)
+{
+    uint8_t key = 0;
+
+    while (key == 0)
+    {
+        key = keyboard_get_key_nonblocking();
+        HAL_Delay(1);
+    }
+
+    return key;
+}

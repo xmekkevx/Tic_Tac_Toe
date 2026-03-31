@@ -1,0 +1,38 @@
+#ifndef GAME_H
+#define GAME_H
+
+#define SIZE 3
+
+typedef enum
+{
+    AI_EASY = 0,
+    AI_MEDIUM,
+    AI_HARD
+} AiDifficulty;
+
+typedef struct {
+    char board[SIZE][SIZE];
+    int turnCounter;
+    char currentPlayer;
+    AiDifficulty aiDifficulty;
+} Game;
+
+/* Initialisiert das Spielfeld */
+void initGame(Game *game);
+
+/* Gibt das Spielfeld aus */
+void printBoard(Game *game);
+
+/* Prüft ob jemand gewonnen hat */
+int checkWin(Game *game, char player);
+
+/* Prüft ob das Feld voll ist */
+int isDraw(Game *game);
+
+/* Führt Spieler-Zug aus */
+int playerMove(Game *game, int pos);
+
+/* Wechselt Spieler */
+void switchPlayer(Game *game);
+
+#endif

@@ -1,0 +1,14 @@
+#ifndef INC_HARDWARETREIBER_KEYBOARD_H_
+#define INC_HARDWARETREIBER_KEYBOARD_H_
+
+#include "stm32l4xx_hal.h"
+#include <stdint.h>
+
+
+
+void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate);
+void get_key_1ms(void);
+uint8_t keyboard_get_key_blocking(void);
+uint8_t keyboard_get_key_nonblocking(void);
+
+#endif /* INC_HARDWARETREIBER_KEYBOARD_H_ */
