@@ -27,8 +27,8 @@ void ui_print_help(void)
 
     printf("| SPI-Tastatur:                   |\r\n");
     printf("| 1-9       = Feld waehlen        |\r\n");
-    printf("| 11        = Yes                 |\r\n");
-    printf("| 12        = No                  |\r\n");
+    printf("| 11        = Ja                  |\r\n");
+    printf("| 12        = Nein                |\r\n");
     printf("| 13        = Korrektur           |\r\n");
     printf("| 14        = Hilfe               |\r\n");
     printf("| 16        = Enter               |\r\n");
@@ -37,7 +37,7 @@ void ui_print_help(void)
 
     printf("| Normale Tastatur:               |\r\n");
     printf("| 1-9       = Feld waehlen        |\r\n");
-    printf("| y / n     = Yes / No            |\r\n");
+    printf("| y / n     = Ja / Nein           |\r\n");
     printf("| Backspace = Korrektur           |\r\n");
     printf("| h         = Hilfe               |\r\n");
     printf("| Enter     = Bestaetigen         |\r\n");

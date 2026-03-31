@@ -21,7 +21,7 @@ typedef enum
 void lcd_init(I2C_HandleTypeDef* hi2c);
 void lcd_clr(void);
 void lcd_putc(char c);
-void lcd_put_str(char* str);
+void lcd_put_str(const char* str);
 void lcd_cur_pos(uint8_t x, uint8_t y);
 void lcd_set_cur_blink(cursor_mode_t cur, cursor_mode_t blink);
 void lcd_set_mode(lcd_mode_t mode);

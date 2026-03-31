@@ -3,7 +3,7 @@
 
 #include "game.h"
 
-/* Berechnet nächsten KI-Zug */
+/* Berechnet nächsten KI-Zug babbbabbaababa */
 int aiMove(Game *game);
 
 /* Liefert lesbaren Namen fuer Schwierigkeitsgrad */

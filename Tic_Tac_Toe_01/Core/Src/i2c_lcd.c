@@ -97,7 +97,7 @@ void lcd_putc(char c)
  *  Parameter:
  *              str : Null-terminierter String
  **/
-void lcd_put_str(char* str)
+void lcd_put_str(const char* str)
 {
     uint8_t i = 0;
 
