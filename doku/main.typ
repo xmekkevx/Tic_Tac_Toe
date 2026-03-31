@@ -68,7 +68,7 @@
 = Hardwaresetup und Konfiguration
 Dieses Kapitel dokumentiert die physikalische Verschaltung sowie die softwareseitige Initialisierung der Peripherie. Weitere allgemeine Spezifikationen zu den genutzten Hardwarekomponenten und dem Mikrocontroller sind den Veranstaltungsunterlagen zu entnehmen.
 
-== Verdrathung und Pin-Setup 
+== Verdrahtung und Pin-Setup 
 
 Die physische Zuordnung der STM32-Peripheriefunktionen zu den verwendeten Hardwarekomponenten ist entscheidend für die spätere softwareseitige Initialisierung. Die folgende Tabelle fasst alle Verbindungen zusammen. Dabei wird der interne Port-Pin Name sowie der auf der Nucleo-32 Platine aufgedruckte Bezeichner angegeben.
 
@@ -118,14 +118,14 @@ Die Initialisierung und hardwarenahe Steuerung erfolgt über das HAL-Framework v
 - *I2C:* I2C1 ist als Standard-I2C-Master konfiguriert, um das Midas-LCD über eine 7-Bit-Adressierung anzusteuern.
 - *SPI:* Um das synchrone serielle Protokoll des kapazitiven Touch-Keypads auszulesen, ist SPI1 als Receive-Only Master konfiguriert. Die Taktpolarität steht auf HIGH, die Taktphase auf der zweiten Flanke. Der Vorteiler ist auf 256 gesetzt.
 - *Timer & DMA:* Zur Generierung des streng getakteten WS2812B-Datenprotokolls wird Timer 2 im PWM-Modus verwendet. Bei einem Timer-Takt von 24 MHz und einem Auto-Reload-Wert von 29 wird die geforderte Frequenz von 800 kHz erreicht. Die Bitmuster werden blockierungsfrei über den DMA-Controller in das Timer-Register übertragen.
-- *Zufallsgenerator (RNG):* Die Hardware-RNG-Peripherie ist aktiviert, um echten Zufall für die Zugberechnung der Tic-Tac-Toe-KI bereitzustellen.
+- *Zufallsgenerator (RNG):* Die Hardware-RNG-Peripherie ist aktiviert, um echten Zufall für die Anfangszug bereitzustellen.
 
 = Architektur
 
 Die Software des Tic-Tac-Toe-Spiels ist nach einem modularen Schichtenmodell aufgebaut. Die physische Dateistruktur des Projekts spiegelt diese Architektur wider, indem die Quellcode-Dateien in Verzeichnisse unterteilt sind. Dies sorgt für eine funktionale Trennung von Hardware-Zugriffen, Spielregeln und der Ein- und Ausgabe.
 
 #figure(
-  image("pictures/architektur.svg", width: 40%),
+  image("pictures/architektur.svg", width: 30%),
   caption: [Schichtenmodell und Datenfluss der Softwarearchitektur.]
 ) <fig_architektur>
 
@@ -138,6 +138,19 @@ Die Schicht *Benutzerschnittstelle* bildet das Bindeglied zwischen dem Benutzer,
 Die *Hardwaretreiber*-Schicht kapselt den direkten Zugriff auf die Elektronik des Mikrocontrollers. Sie enthält keine spielspezifischen Informationen, sondern stellt der Benutzerschnittstelle universelle Funktionen zum Senden und Empfangen von elektrischen Signalen zur Verfügung.
 
 In der Schicht *Spiellogik* ist das reine Regelwerk von Tic-Tac-Toe implementiert. Diese Schicht arbeitet hardwareunabhängig. Sie empfängt Daten von der Benutzerschnittstelle, ändert den internen Spielzustand und gibt Ergebnisse zurück, ohne selbst mit den Treibern zu interagieren.
+
+
+= Einsatz globaler Variablen
+
+Globale Variablen werden grundsätzlich vermieden, da sie die Kopplung erhöhen und den Programmzustand schwerer nachvollziehbar machen.
+
+In diesem System werden sie jedoch gezielt eingesetzt, wenn mehrere Funktionen auf denselben Hardwarezustand zugreifen müssen und eine Übergabe über Parameter unpraktisch oder unnötig wäre.
+
+Ein Beispiel ist das SPI-Handle im Tastaturtreiber, das nach der Initialisierung dauerhaft benötigt wird. Ebenso wird der zuletzt erkannte Tastendruck global gespeichert, da die Erfassung und das Auslesen zeitlich getrennt erfolgen.
+
+Im Neopixel-Treiber werden die LED-Zustände und der DMA-Puffer global gehalten, da diese Daten während der gesamten Übertragung verfügbar bleiben müssen.
+
+Die Verwendung ist damit auf wenige, hardwarebezogene Fälle beschränkt. Die globalen Variablen werden nicht zur allgemeinen Datenhaltung des Programms verwendet, sondern gezielt für gemeinsam genutzte Hardwarezustände und persistente Treiberdaten. 
 
 = Programmablauf
 Der softwareseitige Ablauf des Systems ist, analog zur Architektur, hierarchisch gegliedert. Die Steuerung unterteilt sich in die grundlegende Systeminitialisierung auf oberster Ebene (`main.c`) und die eigentliche Spielschleife, welche die Spielregeln und die Rundenverwaltung (`Run Game`) kapselt.
@@ -175,7 +188,7 @@ Bei dem menschlichen Spieler fordert das System den Benutzer zur Eingabe auf. Di
 
 Für den KI-Spieler wird die Zugberechnung vorbereitet. Die KI ermittelt basierend auf dem gewählten Schwierigkeitsgrad ein gültiges und strategisch sinnvolles Feld und zeigt den gewählten Zug an.
 
-Der ermittelte Zug wird anschließend auf das Spielfeld angewendet. Es folgt eine Validierungsprüfung. Ist der Zug ungültig, z. B. Feld bereits belegt oder Eingabe fehlerhaft, wird eine Fehlermeldung ausgegeben und die Schleife springt zurück, sodass derselbe Spieler seinen Zug wiederholen muss.
+Der ermittelte Zug wird anschließend auf das Spielfeld angewendet. Es folgt eine Validierungsprüfung. Ist der Zug ungültig, z. B. ist das Feld bereits belegt oder die Eingabe fehlerhaft, wird eine Fehlermeldung ausgegeben und die Schleife springt zurück, sodass derselbe Spieler seinen Zug wiederholen muss.
 
 Ist der Zug gültig, wird die Auswahl bestätigt und der LED-Ring entsprechend aktualisiert. Im nächsten Schritt wertet die Spiellogik die neue Feldbelegung aus:
 1. *Siegbedingung:* Hat der aktuelle Zug zu einer vollständigen Reihe geführt, wird eine Siegesanimation auf dem LED-Ring abgespielt. Das finale Spielfeld wird zusammen mit der Siegesmeldung auf LCD und UART ausgegeben. Die Spielschleife endet.
