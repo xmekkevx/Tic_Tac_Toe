@@ -1,4 +1,4 @@
-13:47:02 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
+14:23:52 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
 make -j8 all 
 arm-none-eabi-gcc "../Core/Src/game_runner.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L412xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/game_runner.d" -MT"Core/Src/game_runner.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/game_runner.o"
 arm-none-eabi-gcc "../Core/Src/input.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L412xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/input.d" -MT"Core/Src/input.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/input.o"
@@ -10,15 +10,15 @@ Finished building target: Tic_Tac_Toe_01.elf
 arm-none-eabi-size  Tic_Tac_Toe_01.elf 
 arm-none-eabi-objdump -h -S Tic_Tac_Toe_01.elf  > "Tic_Tac_Toe_01.list"
    text	   data	    bss	    dec	    hex	filename
-  41656	    108	   3828	  45592	   b218	Tic_Tac_Toe_01.elf
+  41540	    108	   3828	  45476	   b1a4	Tic_Tac_Toe_01.elf
 Finished building: default.size.stdout
  
 Finished building: Tic_Tac_Toe_01.list
  
-13:47:07 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
+14:24:03 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
 make -j8 all 
 arm-none-eabi-size  Tic_Tac_Toe_01.elf 
    text	   data	    bss	    dec	    hex	filename
-  41656	    108	   3828	  45592	   b218	Tic_Tac_Toe_01.elf
+  41540	    108	   3828	  45476	   b1a4	Tic_Tac_Toe_01.elf
 Finished building: default.size.stdout
  

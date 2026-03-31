@@ -53,6 +53,7 @@ void get_key_1ms(void)
         if ((key != 0) && (lastkey == 0))
         {
             last_key_pressed = key;
+            keyboard_callback(key);
         }
 
         lastkey = key;

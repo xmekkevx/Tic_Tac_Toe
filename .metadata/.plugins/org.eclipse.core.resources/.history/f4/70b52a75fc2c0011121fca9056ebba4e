@@ -85,7 +85,7 @@ static uint8_t game_handle_human_turn(Game *game)
     int input;
 
     ui_show_player_prompt();
-    input = ui_ask_player_move();
+    input = input_get_confirmed_move_1_to_9();
 
     if (!playerMove(game, input))
     {

@@ -3,6 +3,7 @@
 
 
 void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate);
+void keyboard_set_callback(void (*callback)(uint8_t));
 void get_key_1ms(void);
 uint8_t keyboard_get_key_blocking(void);
 uint8_t keyboard_get_key_nonblocking(void);

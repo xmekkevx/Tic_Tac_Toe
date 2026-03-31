@@ -5,6 +5,12 @@
 static SPI_HandleTypeDef *keyboard_hspi = NULL;
 static uint8_t keyrate = 0xff;
 static volatile uint8_t last_key_pressed = 0;
+static void (*keyboard_callback_fn)(uint8_t) = NULL;
+
+void keyboard_set_callback(void (*callback)(uint8_t))
+{
+    keyboard_callback_fn = callback;
+}
 
 static uint8_t keyboard_get_last_key(void)
 {
@@ -53,6 +59,10 @@ void get_key_1ms(void)
         if ((key != 0) && (lastkey == 0))
         {
             last_key_pressed = key;
+            if (keyboard_callback_fn != NULL)
+            {
+                keyboard_callback_fn(key);
+            }
         }
 
         lastkey = key;

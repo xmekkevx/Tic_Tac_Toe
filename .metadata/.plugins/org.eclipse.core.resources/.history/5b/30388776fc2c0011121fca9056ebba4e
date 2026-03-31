@@ -15,15 +15,16 @@ typedef enum
     INPUT_KEY_7,
     INPUT_KEY_8,
     INPUT_KEY_9,
-    INPUT_KEY_YES = 11,
-    INPUT_KEY_NO = 12,
+	INPUT_KEY_YES = 11,
+	INPUT_KEY_NO = 12,
     INPUT_KEY_BACKSPACE = 13,
     INPUT_KEY_HELP = 14,
     INPUT_KEY_ENTER = 16
 } input_key_t;
 
 void input_init(void);
-input_key_t input_read_key_nonblocking(void);
-input_key_t input_read_key_blocking(void);
+int input_get_yes_no(void);
+uint8_t input_get_confirmed_move_1_to_9(void);
+input_key_t input_get_menu_choice_1_to_3(void);
 
 #endif /* INC_INPUT_H_ */

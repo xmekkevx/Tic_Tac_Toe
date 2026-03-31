@@ -71,6 +71,13 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void keyboard_callback(uint8_t key_val)
+{
+    (void)key_val;
+    HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+}
+
+
 /* USER CODE END 0 */
 
 /**
@@ -114,6 +121,7 @@ int main(void)
 
   lcd_init(&hi2c1);
   keyboard_init(&hspi1, 10);
+  keyboard_set_callback(keyboard_callback);
   input_init();
 
   ui_greet();

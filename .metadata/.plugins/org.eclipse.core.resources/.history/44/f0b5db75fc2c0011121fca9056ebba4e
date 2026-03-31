@@ -11,7 +11,6 @@ void ui_greet(void);
 int ui_ask_start_game(void);
 int ui_ask_replay(void);
 AiDifficulty ui_ask_ai_difficulty(void);
-uint8_t ui_ask_player_move(void);
 
 void ui_prepare_new_game_screen(void);
 void ui_show_goodbye(void);

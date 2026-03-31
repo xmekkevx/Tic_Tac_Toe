@@ -1,24 +1,8 @@
-#include "main.h"
 #include "ui.h"
 #include "i2c_lcd.h"
 #include "input.h"
 #include "ai.h"
 #include <stdio.h>
-
-static void ui_draw_move_selection(uint8_t selected)
-{
-    char line2[9];
-
-    if (selected == 0)
-    {
-        lcd_show_input("Ur turn:", "        ", 0, 1);
-    }
-    else
-    {
-        snprintf(line2, sizeof(line2), "%d OK? ", selected);
-        lcd_show_input("Ur turn:", line2, 0, 1);
-    }
-}
 
 void ui_clear_terminal(void)
 {
@@ -63,7 +47,7 @@ void ui_print_help(void)
 
 void ui_greet(void)
 {
-    ui_clear_terminal();
+	ui_clear_terminal();
     lcd_show_2lines("Welcome ", "to...  ");
     printf("Herzlichen Willkommen zu Tic Tac Toe!\r\n");
     HAL_Delay(2000);
@@ -80,42 +64,12 @@ int ui_ask_yes_no_question(const char *terminal_text,
                            uint8_t cursor_x,
                            uint8_t cursor_y)
 {
-    input_key_t key;
-
     printf("%s\r\n", terminal_text);
     printf("Ja: y oder Taste 11 | Nein: n oder Taste 12\r\n");
 
     lcd_show_input(lcd_line1, lcd_line2, cursor_x, cursor_y);
 
-    while (1)
-    {
-        key = input_read_key_blocking();
-
-        if (key == INPUT_KEY_YES)
-        {
-            lcd_putc('Y');
-            HAL_Delay(500);
-            lcd_set_mode(LCD_MODE_DISPLAY);
-            printf("Ja ausgewaehlt.\r\n");
-            return 1;
-        }
-        else if (key == INPUT_KEY_NO)
-        {
-            lcd_putc('N');
-            HAL_Delay(500);
-            lcd_set_mode(LCD_MODE_DISPLAY);
-            printf("Nein ausgewaehlt.\r\n");
-            return 0;
-        }
-        else if (key == INPUT_KEY_HELP)
-        {
-            ui_clear_terminal();
-            ui_print_help();
-            printf("%s\r\n", terminal_text);
-            printf("Ja: y oder Taste 11 | Nein: n oder Taste 12\r\n");
-            lcd_show_input(lcd_line1, lcd_line2, cursor_x, cursor_y);
-        }
-    }
+    return input_get_yes_no();
 }
 
 int ui_ask_start_game(void)
@@ -153,7 +107,7 @@ AiDifficulty ui_ask_ai_difficulty(void)
 
     while (1)
     {
-        key = input_read_key_blocking();
+        key = input_get_menu_choice_1_to_3();
 
         switch (key)
         {
@@ -175,82 +129,8 @@ AiDifficulty ui_ask_ai_difficulty(void)
                 HAL_Delay(1000);
                 return AI_HARD;
 
-            case INPUT_KEY_HELP:
-                ui_clear_terminal();
-                ui_print_help();
-                printf("Menueauswahl: 1 = Einfach, 2 = Mittel, 3 = Schwer\r\n");
-                lcd_show_input("AI Level", "1/2/3?", 7, 1);
-                break;
-
             default:
                 break;
-        }
-    }
-}
-
-uint8_t ui_ask_player_move(void)
-{
-    uint8_t selected = 0;
-    input_key_t key;
-
-    ui_draw_move_selection(selected);
-
-    while (1)
-    {
-        key = input_read_key_blocking();
-
-        if (key >= INPUT_KEY_1 && key <= INPUT_KEY_9)
-        {
-            uint8_t number = (uint8_t)key;
-
-            if (selected == 0)
-            {
-                selected = number;
-                ui_draw_move_selection(selected);
-                printf("Aktuelle Auswahl: %d\r\n", selected);
-            }
-            else
-            {
-                printf("Auswahl %d bereits gesetzt. Erst korrigieren.\r\n", selected);
-            }
-        }
-        else if (key == INPUT_KEY_BACKSPACE)
-        {
-            selected = 0;
-            ui_draw_move_selection(selected);
-            printf("Korrektur: Auswahl geloescht\r\n");
-        }
-        else if (key == INPUT_KEY_HELP)
-        {
-            ui_clear_terminal();
-            ui_print_help();
-
-            if (selected >= 1 && selected <= 9)
-            {
-                printf("Aktuelle Auswahl: %d\r\n", selected);
-            }
-            else
-            {
-                printf("Aktuelle Auswahl: keine\r\n");
-            }
-
-            ui_draw_move_selection(selected);
-        }
-        else if (key == INPUT_KEY_ENTER)
-        {
-            if (selected >= 1 && selected <= 9)
-            {
-                lcd_set_mode(LCD_MODE_DISPLAY);
-                printf("Eingabe bestaetigt: %d\r\n", selected);
-                return selected;
-            }
-            else
-            {
-                printf("Noch keine gueltige Auswahl vorhanden\r\n");
-                lcd_show_input("Ur turn:", "No sel! ", 0, 1);
-                HAL_Delay(700);
-                ui_draw_move_selection(selected);
-            }
         }
     }
 }
@@ -277,6 +157,7 @@ void ui_show_game_start(char start_player)
     printf("Startspieler: %c\r\n", start_player);
     printf("============================\r\n");
     HAL_Delay(2000);
+
 }
 
 void ui_show_player_prompt(void)
@@ -313,16 +194,16 @@ void ui_show_player_chosen(void)
 
 void ui_show_player_win(void)
 {
-    HAL_Delay(3000);
-    ui_clear_terminal();
+	HAL_Delay(3000);
+	ui_clear_terminal();
     printf("\r\nDu hast gewonnen!\r\n");
     lcd_show_2lines("You", "win!");
 }
 
 void ui_show_ai_win(void)
 {
-    HAL_Delay(3000);
-    ui_clear_terminal();
+	HAL_Delay(3000);
+	ui_clear_terminal();
     printf("\r\nDie KI gewinnt!\r\n");
     lcd_show_2lines("AI", "wins!");
 }
@@ -337,8 +218,9 @@ void ui_show_program_end(void)
 {
     printf("Programm wird beendet.\r\n");
     lcd_show_2lines("Program", "ended.");
-    HAL_Delay(3000);
-    ui_clear_terminal();
+	HAL_Delay(3000);
+	ui_clear_terminal();
+
 }
 
 void ui_show_goodbye(void)

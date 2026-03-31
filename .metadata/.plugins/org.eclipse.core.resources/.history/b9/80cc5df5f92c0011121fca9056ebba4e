@@ -114,6 +114,7 @@ int main(void)
 
   lcd_init(&hi2c1);
   keyboard_init(&hspi1, 10);
+  keyboard_set_callback(keyboard_callback);
   input_init();
 
   ui_greet();
