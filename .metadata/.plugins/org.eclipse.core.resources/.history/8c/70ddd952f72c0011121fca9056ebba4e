@@ -76,6 +76,7 @@ static void game_select_start_player(Game *game)
 static void game_show_round_start(const Game *game)
 {
     ui_show_game_start(game->currentPlayer);
+    ui_show_ai_difficulty(game->aiDifficulty);
     ui_show_player_turn(game->currentPlayer);
     HAL_Delay(1500);
 }
