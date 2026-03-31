@@ -1,0 +1,16 @@
+#ifndef GAME_RUNNER_H
+#define GAME_RUNNER_H
+
+#include "game.h"
+#include "main.h"
+#include "game_runner.h"
+#include "ui.h"
+#include "input.h"
+#include "ai.h"
+#include "ring_game.h"
+#include "i2c_lcd.h"
+#include "rng.h"
+
+void startGame(Game *game);
+
+#endif

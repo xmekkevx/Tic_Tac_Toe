@@ -28,14 +28,20 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
 #include <retarget_stdio.h>
 
 #include "i2c_lcd.h"
 #include "keyboard.h"
 #include "game.h"
-#include "ui.h"
+#include "ai.h"
 #include "input.h"
+#include "ui.h"
 #include "neopixel.h"
+#include "ring_game.h"
 #include "game_runner.h"
 
 /* USER CODE END Includes */

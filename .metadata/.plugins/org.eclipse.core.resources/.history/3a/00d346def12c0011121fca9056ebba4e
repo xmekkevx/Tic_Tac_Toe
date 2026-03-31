@@ -1,0 +1,102 @@
+void startGame(Game *game)
+{
+    int input;
+    int move;
+
+
+    lcd_show_2lines("Game", "starts!");
+    HAL_Delay(2000);
+
+    initGame(game);
+
+    uint32_t start_random = 0;
+
+    HAL_RNG_GenerateRandomNumber(&hrng, &start_random);
+
+    if ((start_random & 0x01u) == 0u)
+        game->currentPlayer = 'X';
+    else
+        game->currentPlayer = 'O';
+
+    ring_game_init();
+    ring_game_show_start_player(game->currentPlayer);
+
+    ui_show_game_start(game->currentPlayer);
+    ui_show_ai_difficulty(game->aiDifficulty);
+    ui_show_player_turn(game->currentPlayer);
+    HAL_Delay(1500);
+
+    while (1)
+    {
+    	ui_show_game_screen(game);
+
+        if (game->currentPlayer == 'X')
+        {
+        	ui_show_player_prompt();
+        	input = input_get_confirmed_move_1_to_9();
+
+            if (!playerMove(game, input))
+            {
+            	ui_show_field_taken(input);
+            	HAL_Delay(1200);
+                continue;
+            }
+
+            ui_show_player_chosen();
+            HAL_Delay(800);
+            ring_game_update_turns(game->turnCounter);
+        }
+        else
+        {
+        	ui_show_ai_thinking();
+        	HAL_Delay(2000);
+
+            move = aiMove(game);
+
+            ui_show_ai_move(move);
+            HAL_Delay(1800);
+
+            playerMove(game, move);
+            ring_game_update_turns(game->turnCounter);
+        }
+
+        if (checkWin(game, game->currentPlayer))
+        {
+            printBoard(game);
+
+            if (game->currentPlayer == 'X')
+            {
+                ui_show_player_win();
+                ring_game_animate_x_win();
+                HAL_Delay(1000);
+            }
+            else
+            {
+                ui_show_ai_win();
+                ring_game_animate_o_win();
+                HAL_Delay(1000);
+            }
+
+            ring_game_clear();
+
+
+            break;
+        }
+
+        if (isDraw(game))
+        {
+            printBoard(game);
+
+            ui_show_draw();
+            ring_game_clear();
+            HAL_Delay(2000);
+
+            break;
+        }
+
+        switchPlayer(game);
+
+        ui_show_player_turn(game->currentPlayer);
+        HAL_Delay(1000);
+    }
+}
