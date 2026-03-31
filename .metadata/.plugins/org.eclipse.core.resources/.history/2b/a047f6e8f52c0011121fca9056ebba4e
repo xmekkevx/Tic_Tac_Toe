@@ -150,7 +150,7 @@ int main(void)
 
 	ui_prepare_new_game_screen();
 
-	game_run(&game);
+	startGame(&game);
 
 	if (!ui_ask_replay())
 	{

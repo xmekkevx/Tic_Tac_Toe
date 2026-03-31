@@ -3,6 +3,6 @@
 
 #include "game.h"
 
-void game_run(Game *game);
+void startGame(Game *game);
 
-#endif /* GAME_RUNNER_H */
+#endif
