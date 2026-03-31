@@ -1,0 +1,29 @@
+#ifndef INC_BENUTZERSCHNITTSTELLE_INPUT_H_
+#define INC_BENUTZERSCHNITTSTELLE_INPUT_H_
+
+#include <stdint.h>
+
+typedef enum
+{
+    INPUT_KEY_NONE = 0,
+    INPUT_KEY_1 = 1,
+    INPUT_KEY_2,
+    INPUT_KEY_3,
+    INPUT_KEY_4,
+    INPUT_KEY_5,
+    INPUT_KEY_6,
+    INPUT_KEY_7,
+    INPUT_KEY_8,
+    INPUT_KEY_9,
+    INPUT_KEY_YES = 11,
+    INPUT_KEY_NO = 12,
+    INPUT_KEY_BACKSPACE = 13,
+    INPUT_KEY_HELP = 14,
+    INPUT_KEY_ENTER = 16
+} input_key_t;
+
+void input_init(void);
+input_key_t input_read_key_nonblocking(void);
+input_key_t input_read_key_blocking(void);
+
+#endif /* INC_BENUTZERSCHNITTSTELLE_INPUT_H_ */

@@ -17,12 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <Benutzerschnittstelle/input.h>
-#include <Benutzerschnittstelle/ui.h>
-#include <Hardwaretreiber/i2c_lcd.h>
-#include <Hardwaretreiber/keyboard.h>
-#include <Hardwaretreiber/neopixel.h>
-#include <Hardwaretreiber/retarget_stdio.h>
 #include "main.h"
 #include "dma.h"
 #include "i2c.h"
@@ -34,6 +28,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <Benutzerschnittstelle/input.h>
+#include <Benutzerschnittstelle/ui.h>
+#include <Hardwaretreiber/i2c_lcd.h>
+#include <Hardwaretreiber/keyboard.h>
+#include <Hardwaretreiber/neopixel.h>
+#include <Hardwaretreiber/retarget_stdio.h>
 #include <Spiellogik/game.h>
 #include <Spiellogik/game_runner.h>
 
@@ -114,7 +114,6 @@ int main(void)
 
   lcd_init(&hi2c1);
   keyboard_init(&hspi1, 10);
-  input_init();
 
   ui_greet();
 

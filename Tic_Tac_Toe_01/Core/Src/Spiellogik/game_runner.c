@@ -15,6 +15,11 @@ static uint8_t game_handle_human_turn(Game *game);
 static void game_handle_ai_turn(Game *game);
 static uint8_t game_handle_end_state(Game *game);
 
+/*
+ * Eingang: game
+ * Verarbeitung: Initialisiert die Runde und steuert den kompletten Spielablauf bis zum Ende
+ * Ausgang: Spiel wird vollständig durchgeführt
+ */
 void game_run(Game *game)
 {
     game_prepare_round(game);
@@ -47,6 +52,11 @@ void game_run(Game *game)
     }
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Setzt das Spiel zurück, bestimmt den Startspieler und initialisiert die Anzeige
+ * Ausgang: Spiel ist für eine neue Runde vorbereitet
+ */
 static void game_prepare_round(Game *game)
 {
 
@@ -57,6 +67,11 @@ static void game_prepare_round(Game *game)
     ring_game_show_start_player(game->currentPlayer);
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Bestimmt zufällig den Startspieler mittels Zufallszahl
+ * Ausgang: currentPlayer wird auf 'X' oder 'O' gesetzt
+ */
 static void game_select_start_player(Game *game)
 {
     uint32_t start_random = 0;
@@ -73,6 +88,11 @@ static void game_select_start_player(Game *game)
     }
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Zeigt den Start der Runde und den aktuellen Spieler an
+ * Ausgang: Anzeige des Spielbeginns
+ */
 static void game_show_round_start(const Game *game)
 {
     ui_show_game_start(game->currentPlayer);
@@ -80,6 +100,11 @@ static void game_show_round_start(const Game *game)
     HAL_Delay(1500);
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Führt den Zug des Spielers aus und prüft auf gültige Eingabe
+ * Ausgang: 1 bei erfolgreichem Zug, sonst 0
+ */
 static uint8_t game_handle_human_turn(Game *game)
 {
     int input;
@@ -101,6 +126,11 @@ static uint8_t game_handle_human_turn(Game *game)
     return 1;
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Berechnet den KI-Zug und führt ihn aus
+ * Ausgang: Spielzustand wird aktualisiert
+ */
 static void game_handle_ai_turn(Game *game)
 {
     int move;
@@ -117,6 +147,11 @@ static void game_handle_ai_turn(Game *game)
     ring_game_update_turns(game->turnCounter);
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Prüft auf Sieg oder Unentschieden und zeigt das Ergebnis an
+ * Ausgang: 1 wenn Spiel beendet, sonst 0
+ */
 static uint8_t game_handle_end_state(Game *game)
 {
     if (checkWin(game, game->currentPlayer))

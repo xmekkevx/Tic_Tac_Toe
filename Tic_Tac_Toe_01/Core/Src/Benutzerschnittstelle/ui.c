@@ -5,6 +5,11 @@
 #include <stdio.h>
 #include <Spiellogik/ai.h>
 
+/*
+ * Eingang: selected
+ * Verarbeitung: Erstellt abhängig von der Auswahl die Anzeige für das LCD
+ * Ausgang: aktuelle Auswahl wird auf dem LCD dargestellt
+ */
 static void ui_draw_move_selection(uint8_t selected)
 {
     char line2[9];
@@ -20,11 +25,21 @@ static void ui_draw_move_selection(uint8_t selected)
     }
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Löscht den aktuellen Terminalinhalt
+ * Ausgang: leeres Terminal
+ */
 void ui_clear_terminal(void)
 {
     printf("\033[2J\033[H");
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Gibt  Hilfe mit Spielfeld und Tastenbelegung aus
+ * Ausgang: Hilfetext im Terminal
+ */
 void ui_print_help(void)
 {
     printf("\n");
@@ -61,6 +76,11 @@ void ui_print_help(void)
     printf("+=================================+\r\n\n");
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Zeigt die Begrüßung auf LCD und Terminal an
+ * Ausgang: Begrüßungsanzeige, danach leeres LCD
+ */
 void ui_greet(void)
 {
     ui_clear_terminal();
@@ -74,6 +94,11 @@ void ui_greet(void)
     lcd_clr();
 }
 
+/*
+ * Eingang: terminal_text, lcd_line1, lcd_line2, cursor_x, cursor_y
+ * Verarbeitung: Zeigt eine Ja-/Nein-Frage an und wertet die Eingabe aus
+ * Ausgang: 1 bei Ja, 0 bei Nein
+ */
 int ui_ask_yes_no_question(const char *terminal_text,
                            const char *lcd_line1,
                            const char *lcd_line2,
@@ -116,6 +141,11 @@ int ui_ask_yes_no_question(const char *terminal_text,
     }
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Fragt, ob das Spiel gestartet werden soll
+ * Ausgang: 1 bei Ja, 0 bei Nein
+ */
 int ui_ask_start_game(void)
 {
     return ui_ask_yes_no_question(
@@ -127,6 +157,11 @@ int ui_ask_start_game(void)
     );
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Fragt, ob erneut gespielt werden soll
+ * Ausgang: 1 bei Ja, 0 bei Nein
+ */
 int ui_ask_replay(void)
 {
     return ui_ask_yes_no_question(
@@ -138,6 +173,11 @@ int ui_ask_replay(void)
     );
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Fragt die gewünschte KI-Schwierigkeit ab
+ * Ausgang: gewählte Schwierigkeitsstufe
+ */
 AiDifficulty ui_ask_ai_difficulty(void)
 {
     input_key_t key;
@@ -186,6 +226,11 @@ AiDifficulty ui_ask_ai_difficulty(void)
     }
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Liest Feldwahl, Korrektur und Bestätigung des Spielers ein
+ * Ausgang: gewähltes Feld von 1 bis 9
+ */
 uint8_t ui_ask_player_move(void)
 {
     uint8_t selected = 0;
@@ -253,12 +298,22 @@ uint8_t ui_ask_player_move(void)
     }
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Löscht das Terminal und zeigt die Hilfe an
+ * Ausgang: vorbereitete Spielanzeige für neues Spiel
+ */
 void ui_prepare_new_game_screen(void)
 {
     ui_clear_terminal();
     ui_print_help();
 }
 
+/*
+ * Eingang: player
+ * Verarbeitung: Erstellt den Text für den aktuellen Spieler und zeigt ihn an
+ * Ausgang: Spieleranzeige auf dem LCD
+ */
 void ui_show_player_turn(char player)
 {
     char line1[9];
@@ -267,6 +322,11 @@ void ui_show_player_turn(char player)
     lcd_show_2lines(line1, "");
 }
 
+/*
+ * Eingang: start_player
+ * Verarbeitung: Zeigt den Spielstart und den Startspieler an
+ * Ausgang: Ausgabe zum Spielbeginn
+ */
 void ui_show_game_start(char start_player)
 {
     lcd_show_2lines("Game", "starts!");
@@ -277,18 +337,33 @@ void ui_show_game_start(char start_player)
     HAL_Delay(2000);
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Gibt die Eingabehinweise für den Spieler aus
+ * Ausgang: Hinweistext im Terminal
+ */
 void ui_show_player_prompt(void)
 {
     printf("\r\nDu bist dran!\r\n");
     printf("Waehle Feld 1-9, Taste 13/Backspace = Korrektur, Taste 14/h = Hilfe, Taste 16/Enter = Eingabe\r\n");
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Zeigt an, dass die KI gerade berechnet
+ * Ausgang: Statusanzeige für die KI
+ */
 void ui_show_ai_thinking(void)
 {
     printf("\r\nKI denkt...\r\n");
     lcd_show_2lines("AI", "thinks...");
 }
 
+/*
+ * Eingang: move
+ * Verarbeitung: Gibt den von der KI gewählten Zug aus
+ * Ausgang: Anzeige des KI-Zugs
+ */
 void ui_show_ai_move(uint8_t move)
 {
     char aiMsg[9];
@@ -298,17 +373,32 @@ void ui_show_ai_move(uint8_t move)
     lcd_show_2lines("AI move:", aiMsg);
 }
 
+/*
+ * Eingang: field
+ * Verarbeitung: Meldet, dass das Feld bereits belegt ist
+ * Ausgang: Hinweis auf ungültige Feldwahl
+ */
 void ui_show_field_taken(uint8_t field)
 {
     printf("Feld %d ist bereits belegt!\r\n", field);
     lcd_show_2lines("Field", "Taken! ");
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Zeigt an, dass die Spielerauswahl übernommen wurde
+ * Ausgang: Bestätigungsanzeige auf dem LCD
+ */
 void ui_show_player_chosen(void)
 {
     lcd_show_2lines("Chosen!", "");
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Wartet kurz und zeigt danach den Sieg des Spielers an
+ * Ausgang: Gewinnanzeige für den Spieler
+ */
 void ui_show_player_win(void)
 {
     HAL_Delay(3000);
@@ -317,6 +407,11 @@ void ui_show_player_win(void)
     lcd_show_2lines("You", "win!");
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Wartet kurz und zeigt danach den Sieg der KI an
+ * Ausgang: Gewinnanzeige für die KI
+ */
 void ui_show_ai_win(void)
 {
     HAL_Delay(3000);
@@ -325,12 +420,22 @@ void ui_show_ai_win(void)
     lcd_show_2lines("AI", "wins!");
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Zeigt ein Unentschieden an
+ * Ausgang: Anzeige für Unentschieden
+ */
 void ui_show_draw(void)
 {
     printf("\r\nUnentschieden!\r\n");
     lcd_show_2lines("Draw!", "");
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Zeigt die Beendigung und eine Abschiedsanzeige an
+ * Ausgang: geleerte Anzeige nach Programmende
+ */
 void ui_show_goodbye(void)
 {
 	printf("Programm wird beendet.\r\n");
@@ -347,6 +452,11 @@ void ui_show_goodbye(void)
     lcd_clr();
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Löscht das Terminal, gibt das Spielfeld aus und zeigt den aktuellen Spieler
+ * Ausgang: aktueller Spielstand im Terminal
+ */
 void ui_show_game_screen(Game *game)
 {
     ui_clear_terminal();

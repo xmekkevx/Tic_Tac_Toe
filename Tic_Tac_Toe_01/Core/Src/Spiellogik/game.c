@@ -2,6 +2,11 @@
 #include <Spiellogik/game.h>
 
 
+/*
+ * Eingang: game
+ * Verarbeitung: Setzt Spielstand, Startspieler und alle Felder auf Anfangswerte zurück
+ * Ausgang: neues leeres Spiel
+ */
 void initGame(Game *game) {
     game->turnCounter = 0;
     game->currentPlayer = 'X';
@@ -13,7 +18,11 @@ void initGame(Game *game) {
     }
 }
 
-
+/*
+ * Eingang: game
+ * Verarbeitung: Gibt das aktuelle Spielfeld im Terminal aus
+ * Ausgang: sichtbare Darstellung des Spielfelds
+ */
 void printBoard(Game *game) {
     printf("\r\n");
 
@@ -30,7 +39,11 @@ void printBoard(Game *game) {
     printf("\n");
 }
 
-
+/*
+ * Eingang: game, player
+ * Verarbeitung: Prüft Reihen, Spalten und Diagonalen auf einen Sieg des Spielers
+ * Ausgang: 1 bei Sieg, sonst 0
+ */
 int checkWin(Game *game, char player) {
 
     /* Reihen */
@@ -63,12 +76,20 @@ int checkWin(Game *game, char player) {
     return 0;
 }
 
-
+/*
+ * Eingang: game
+ * Verarbeitung: Prüft, ob bereits alle Züge verbraucht sind
+ * Ausgang: 1 bei Unentschieden, sonst 0
+ */
 int isDraw(Game *game) {
     return game->turnCounter >= 9;
 }
 
-
+/*
+ * Eingang: game, pos
+ * Verarbeitung: Prüft die Position und setzt den Zug des aktuellen Spielers, falls das Feld frei ist
+ * Ausgang: 1 bei erfolgreichem Zug, sonst 0
+ */
 int playerMove(Game *game, int pos) {
 
     if (pos < 1 || pos > 9)
@@ -86,7 +107,11 @@ int playerMove(Game *game, int pos) {
     return 1;
 }
 
-
+/*
+ * Eingang: game
+ * Verarbeitung: Wechselt den aktuellen Spieler von X zu O oder von O zu X
+ * Ausgang: currentPlayer ist auf den anderen Spieler gesetzt
+ */
 void switchPlayer(Game *game) {
 
     if (game->currentPlayer == 'X')

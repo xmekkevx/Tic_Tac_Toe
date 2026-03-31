@@ -1,10 +1,3 @@
-/*
- * Funktionen zum Midas I2C-LCD 2x8 (MC20805A6W-BNMLWI-V2)
- *
- * Version 1.0
- *
- * Joenen / HS Osnabrück
- */
 #include <Hardwaretreiber/i2c_lcd.h>
 
 #define LCD_I2C_ADDR 0x78           // I2C Adresse der LCD Anzeige
@@ -158,6 +151,11 @@ void lcd_set_cur_blink(cursor_mode_t cur, cursor_mode_t blink)
 
 
 
+/*
+ * Eingang: mode
+ * Verarbeitung: Setzt den LCD-Modus und aktiviert/deaktiviert Cursor und Blinken
+ * Ausgang: LCD ist im gewünschten Modus (Anzeige oder Eingabe)
+ */
 void lcd_set_mode(lcd_mode_t mode)
 {
     switch (mode)
@@ -176,6 +174,11 @@ void lcd_set_mode(lcd_mode_t mode)
     }
 }
 
+/*
+ * Eingang: line, text
+ * Verarbeitung: Löscht die gewählte Zeile und schreibt den Text hinein
+ * Ausgang: Text wird in der angegebenen LCD-Zeile angezeigt
+ */
 void lcd_show_1line(uint8_t line, const char* text)
 {
     if (line > 1) return;
@@ -189,6 +192,11 @@ void lcd_show_1line(uint8_t line, const char* text)
     lcd_put_str(text);
 }
 
+/*
+ * Eingang: line1, line2
+ * Verarbeitung: Löscht das Display und zeigt zwei Textzeilen an
+ * Ausgang: beide Zeilen werden auf dem LCD dargestellt
+ */
 void lcd_show_2lines(const char* line1, const char* line2)
 {
     lcd_clr();
@@ -201,6 +209,11 @@ void lcd_show_2lines(const char* line1, const char* line2)
     lcd_put_str(line2);
 }
 
+/*
+ * Eingang: line1, line2, cursor_x, cursor_y
+ * Verarbeitung: Zeigt zwei Zeilen an, setzt den Cursor und aktiviert den Eingabemodus
+ * Ausgang: LCD zeigt Text und positionierten Eingabecursor
+ */
 void lcd_show_input(const char* line1, const char* line2, uint8_t cursor_x, uint8_t cursor_y)
 {
     lcd_clr();

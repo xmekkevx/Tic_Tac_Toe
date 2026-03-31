@@ -22,7 +22,6 @@ typedef enum
     INPUT_KEY_ENTER = 16
 } input_key_t;
 
-void input_init(void);
 input_key_t input_read_key_nonblocking(void);
 input_key_t input_read_key_blocking(void);
 

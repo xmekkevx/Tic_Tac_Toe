@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include <Spiellogik/ai.h>
 
+/*
+ * Eingang: game
+ * Verarbeitung: Sucht alle freien Felder und wählt eines zufällig aus
+ * Ausgang: Nummer eines freien Feldes oder -1
+ */
 static int aiGetRandomMove(Game *game)
 {
     int freeFields[9];
@@ -22,6 +27,11 @@ static int aiGetRandomMove(Game *game)
     return freeFields[rand() % count];
 }
 
+/*
+ * Eingang: game, player
+ * Verarbeitung: Prüft für jedes freie Feld, ob damit direkt ein Gewinn möglich ist
+ * Ausgang: Gewinnfeld des Spielers oder -1
+ */
 static int aiFindWinningMove(Game *game, char player)
 {
     int i, row, col;
@@ -45,11 +55,21 @@ static int aiFindWinningMove(Game *game, char player)
     return -1;
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Wählt einen zufälligen gültigen Zug
+ * Ausgang: Feldnummer oder -1
+ */
 static int aiMoveEasy(Game *game)
 {
     return aiGetRandomMove(game);
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Prüft zuerst eigenen Gewinnzug, dann Blockierung des Gegners, sonst Zufallszug
+ * Ausgang: gewähltes Feld oder -1
+ */
 static int aiMoveMedium(Game *game)
 {
     int move;
@@ -69,6 +89,11 @@ static int aiMoveMedium(Game *game)
     return aiGetRandomMove(game);
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Prüft Gewinnzug, Blockierung, Mitte, Ecken und Seiten in dieser Reihenfolge
+ * Ausgang: bestmöglich gewähltes Feld oder -1
+ */
 static int aiMoveHard(Game *game)
 {
     int i, row, col;
@@ -112,6 +137,11 @@ static int aiMoveHard(Game *game)
     return -1;
 }
 
+/*
+ * Eingang: game
+ * Verarbeitung: Wählt abhängig von der eingestellten Schwierigkeit die passende KI-Logik
+ * Ausgang: berechnetes Feld für den KI-Zug
+ */
 int aiMove(Game *game)
 {
     switch (game->aiDifficulty) {
@@ -129,6 +159,11 @@ int aiMove(Game *game)
     }
 }
 
+/*
+ * Eingang: difficulty
+ * Verarbeitung: Ordnet der Schwierigkeitsstufe den passenden Text zu
+ * Ausgang: Text zur Schwierigkeitsstufe
+ */
 const char* aiDifficultyToString(AiDifficulty difficulty)
 {
     switch (difficulty) {

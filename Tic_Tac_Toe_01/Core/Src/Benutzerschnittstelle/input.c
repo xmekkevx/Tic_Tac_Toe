@@ -3,6 +3,11 @@
 #include "main.h"
 #include "usart.h"
 
+/*
+ * Eingang: key (SPI-Tastencode)
+ * Verarbeitung: Zuordnung zu internen Tastenwerten
+ * Ausgang: entsprechender input_key_t oder INPUT_KEY_NONE
+ */
 static input_key_t input_map_spi_key(uint8_t key)
 {
     switch (key)
@@ -25,6 +30,11 @@ static input_key_t input_map_spi_key(uint8_t key)
     }
 }
 
+/*
+ * Eingang: c (UART-Zeichen)
+ * Verarbeitung: Mapping auf interne Taste
+ * Ausgang: entsprechender input_key_t oder INPUT_KEY_NONE
+ */
 static input_key_t input_map_uart_char(char c)
 {
     switch (c)
@@ -58,6 +68,11 @@ static input_key_t input_map_uart_char(char c)
     }
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Liest nicht-blockierend Taste über SPI und mappt sie
+ * Ausgang: erkannte Taste oder INPUT_KEY_NONE
+ */
 static input_key_t input_get_spi_key_nonblocking(void)
 {
     uint8_t key = keyboard_get_key_nonblocking();
@@ -70,6 +85,11 @@ static input_key_t input_get_spi_key_nonblocking(void)
     return input_map_spi_key(key);
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Liest nicht-blockierend Zeichen über UART und mappt es
+ * Ausgang: erkannte Taste oder INPUT_KEY_NONE
+ */
 static input_key_t input_get_uart_key_nonblocking(void)
 {
     char c;
@@ -82,11 +102,11 @@ static input_key_t input_get_uart_key_nonblocking(void)
     return INPUT_KEY_NONE;
 }
 
-void input_init(void)
-{
-    /* aktuell nichts noetig */
-}
-
+/*
+ * Eingang: -
+ * Verarbeitung: Prüft zuerst SPI, dann UART auf Eingaben
+ * Ausgang: erkannte Taste oder INPUT_KEY_NONE
+ */
 input_key_t input_read_key_nonblocking(void)
 {
     input_key_t key;
@@ -106,6 +126,11 @@ input_key_t input_read_key_nonblocking(void)
     return INPUT_KEY_NONE;
 }
 
+/*
+ * Eingang: -
+ * Verarbeitung: Wartet in Schleife bis eine Taste erkannt wird
+ * Ausgang: erkannte Taste
+ */
 input_key_t input_read_key_blocking(void)
 {
     input_key_t key;

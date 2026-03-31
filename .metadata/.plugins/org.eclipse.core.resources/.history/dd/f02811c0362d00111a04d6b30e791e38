@@ -1,0 +1,167 @@
+#include <Benutzerschnittstelle/ring_game.h>
+#include <Hardwaretreiber/neopixel.h>
+#include "main.h"
+
+#define COLOR_X_R 255
+#define COLOR_X_G 0
+#define COLOR_X_B 0
+
+#define COLOR_O_R 0
+#define COLOR_O_G 255
+#define COLOR_O_B 0
+
+static char start_player = 'X';
+static uint8_t led_state[NEOPIXEL_LED_COUNT][3];
+
+static void ring_game_clear_state(void)
+{
+    for (uint8_t i = 0; i < NEOPIXEL_LED_COUNT; i++)
+    {
+        led_state[i][0] = 0;
+        led_state[i][1] = 0;
+        led_state[i][2] = 0;
+    }
+}
+
+static void ring_game_push_state_to_ring(void)
+{
+    neopixel_clear();
+
+    for (uint8_t i = 0; i < NEOPIXEL_LED_COUNT; i++)
+    {
+        neopixel_set_led(i, led_state[i][0], led_state[i][1], led_state[i][2]);
+    }
+
+    neopixel_show();
+}
+
+static void ring_game_rotate_left_once(void)
+{
+    uint8_t first_r = led_state[0][0];
+    uint8_t first_g = led_state[0][1];
+    uint8_t first_b = led_state[0][2];
+
+    for (uint8_t i = 0; i < (NEOPIXEL_LED_COUNT - 1); i++)
+    {
+        led_state[i][0] = led_state[i + 1][0];
+        led_state[i][1] = led_state[i + 1][1];
+        led_state[i][2] = led_state[i + 1][2];
+    }
+
+    led_state[NEOPIXEL_LED_COUNT - 1][0] = first_r;
+    led_state[NEOPIXEL_LED_COUNT - 1][1] = first_g;
+    led_state[NEOPIXEL_LED_COUNT - 1][2] = first_b;
+}
+
+static void ring_game_rotate_right_once(void)
+{
+    uint8_t last_r = led_state[NEOPIXEL_LED_COUNT - 1][0];
+    uint8_t last_g = led_state[NEOPIXEL_LED_COUNT - 1][1];
+    uint8_t last_b = led_state[NEOPIXEL_LED_COUNT - 1][2];
+
+    for (int i = NEOPIXEL_LED_COUNT - 1; i > 0; i--)
+    {
+        led_state[i][0] = led_state[i - 1][0];
+        led_state[i][1] = led_state[i - 1][1];
+        led_state[i][2] = led_state[i - 1][2];
+    }
+
+    led_state[0][0] = last_r;
+    led_state[0][1] = last_g;
+    led_state[0][2] = last_b;
+}
+
+void ring_game_init(void)
+{
+    start_player = 'X';
+    ring_game_clear_state();
+    ring_game_push_state_to_ring();
+}
+
+void ring_game_show_start_player(char player)
+{
+    start_player = player;
+    ring_game_clear_state();
+
+    if (player == 'X')
+    {
+        led_state[0][0] = COLOR_X_R;
+        led_state[0][1] = COLOR_X_G;
+        led_state[0][2] = COLOR_X_B;
+    }
+    else
+    {
+        led_state[0][0] = COLOR_O_R;
+        led_state[0][1] = COLOR_O_G;
+        led_state[0][2] = COLOR_O_B;
+    }
+
+    ring_game_push_state_to_ring();
+}
+
+void ring_game_update_turns(uint8_t turn_count)
+{
+    ring_game_clear_state();
+
+    for (uint8_t i = 0; i < turn_count && i < NEOPIXEL_LED_COUNT; i++)
+    {
+        if ((i % 2) == 0)
+        {
+            if (start_player == 'X')
+            {
+                led_state[i][0] = COLOR_X_R;
+                led_state[i][1] = COLOR_X_G;
+                led_state[i][2] = COLOR_X_B;
+            }
+            else
+            {
+                led_state[i][0] = COLOR_O_R;
+                led_state[i][1] = COLOR_O_G;
+                led_state[i][2] = COLOR_O_B;
+            }
+        }
+        else
+        {
+            if (start_player == 'X')
+            {
+                led_state[i][0] = COLOR_O_R;
+                led_state[i][1] = COLOR_O_G;
+                led_state[i][2] = COLOR_O_B;
+            }
+            else
+            {
+                led_state[i][0] = COLOR_X_R;
+                led_state[i][1] = COLOR_X_G;
+                led_state[i][2] = COLOR_X_B;
+            }
+        }
+    }
+
+    ring_game_push_state_to_ring();
+}
+
+void ring_game_clear(void)
+{
+    ring_game_clear_state();
+    ring_game_push_state_to_ring();
+}
+
+void ring_game_animate_x_win(void)
+{
+    for (uint8_t step = 0; step < 24; step++)
+    {
+        ring_game_rotate_left_once();
+        ring_game_push_state_to_ring();
+        HAL_Delay(120);
+    }
+}
+
+void ring_game_animate_o_win(void)
+{
+    for (uint8_t step = 0; step < 24; step++)
+    {
+        ring_game_rotate_right_once();
+        ring_game_push_state_to_ring();
+        HAL_Delay(120);
+    }
+}
