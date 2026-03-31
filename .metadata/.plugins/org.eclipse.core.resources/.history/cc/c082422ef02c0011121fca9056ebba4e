@@ -42,6 +42,7 @@
 #include "ui.h"
 #include "neopixel.h"
 #include "ring_game.h"
+#include "rng.h"
 
 /* USER CODE END Includes */
 
@@ -71,10 +72,27 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+uint32_t random_int(uint32_t min, uint32_t max);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+uint32_t random_int(uint32_t min, uint32_t max)
+{
+    uint32_t z = 0;
+
+    if (min > max)
+    {
+        uint32_t temp = min;
+        min = max;
+        max = temp;
+    }
+
+    HAL_RNG_GenerateRandomNumber(&hrng, &z);
+    return min + (z % (max - min + 1));
+}
 
 void keyboard_callback(uint8_t key_val)
 {
@@ -234,6 +252,8 @@ int main(void)
   ui_greet();
 
   neopixel_init();
+
+  MX_RNG_Init();
 
   Game game;
 
