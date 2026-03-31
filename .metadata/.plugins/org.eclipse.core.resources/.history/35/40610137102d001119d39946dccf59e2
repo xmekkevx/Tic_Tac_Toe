@@ -123,7 +123,7 @@ int main(void)
   Game game;
 
   if (!ui_ask_start_game()) {
-	  ui_show_goodbye();
+      ui_show_program_end();
       return 0;
   }
 

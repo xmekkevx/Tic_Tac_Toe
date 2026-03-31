@@ -1,7 +1,5 @@
-14:23:52 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
+16:45:47 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
 make -j8 all 
-arm-none-eabi-gcc "../Core/Src/game_runner.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L412xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/game_runner.d" -MT"Core/Src/game_runner.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/game_runner.o"
-arm-none-eabi-gcc "../Core/Src/input.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L412xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/input.d" -MT"Core/Src/input.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/input.o"
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L412xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc "../Core/Src/ui.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L412xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/ui.d" -MT"Core/Src/ui.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/ui.o"
 arm-none-eabi-gcc -o "Tic_Tac_Toe_01.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\a911353\Desktop\6. Semester\Eingebettete Systeme\Prüfungsleistung\Tic_Tac_Toe_01\STM32L412KBUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Tic_Tac_Toe_01.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
@@ -10,15 +8,22 @@ Finished building target: Tic_Tac_Toe_01.elf
 arm-none-eabi-size  Tic_Tac_Toe_01.elf 
 arm-none-eabi-objdump -h -S Tic_Tac_Toe_01.elf  > "Tic_Tac_Toe_01.list"
    text	   data	    bss	    dec	    hex	filename
-  41540	    108	   3828	  45476	   b1a4	Tic_Tac_Toe_01.elf
+  41456	    108	   3828	  45392	   b150	Tic_Tac_Toe_01.elf
 Finished building: default.size.stdout
  
 Finished building: Tic_Tac_Toe_01.list
  
-14:24:03 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
+16:45:58 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
 make -j8 all 
 arm-none-eabi-size  Tic_Tac_Toe_01.elf 
    text	   data	    bss	    dec	    hex	filename
-  41540	    108	   3828	  45476	   b1a4	Tic_Tac_Toe_01.elf
+  41456	    108	   3828	  45392	   b150	Tic_Tac_Toe_01.elf
+Finished building: default.size.stdout
+ 
+16:46:21 **** Incremental Build of configuration Debug for project Tic_Tac_Toe_01 ****
+make -j8 all 
+arm-none-eabi-size  Tic_Tac_Toe_01.elf 
+   text	   data	    bss	    dec	    hex	filename
+  41456	    108	   3828	  45392	   b150	Tic_Tac_Toe_01.elf
 Finished building: default.size.stdout
  
